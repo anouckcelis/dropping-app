@@ -1,0 +1,64 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: black;
+  background-image: url('./images/kaartachtergrond.png'); /* Vervang 'pad/naar/jouw/achtergrondfoto.jpg' door het juiste pad naar jouw afbeelding */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: rgba(255, 255, 255, 0.8); /* Als je een deel van de achtergrondafbeelding wilt zien, kun je de achtergrondkleur met een lage dekking instellen */
+}
+
+.titleCon {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #257eca;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  font-style: italic;
+  color: grey;
+}
+
+.buttonContainer {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.inputButton {
+  padding: 15px 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #257eca;
+  color: white;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.email {
+  margin-top: 20px;
+  font-size: 1rem;
+}
+
+.logo {
+  margin-top: 50px;
+}
+
+.logo img {
+  width: 200px;
+  height: auto;
+}
+
+.info {
+  font-size: 20px;
+}
