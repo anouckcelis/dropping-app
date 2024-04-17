@@ -1,0 +1,34 @@
+.newGame-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    align-items: center;
+    height: 91vh;
+    color: black;
+    background-image: url('./images/kaartachtergrond.png'); /* Vervang 'pad/naar/jouw/achtergrondfoto.jpg' door het juiste pad naar jouw afbeelding */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba(255, 255, 255, 0.8); /* Als je een deel van de achtergrondafbeelding wilt zien, kun je de achtergrondkleur met een lage dekking instellen */
+    }
+    
+    .centered-content {
+      text-align: center;
+    }
+    
+    h1, h4 {
+      color: 
+      #257eca;
+    }
+    
+    p {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    
+    h4 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    

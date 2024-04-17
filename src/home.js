@@ -1,13 +1,21 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Importeer useNavigate van react-router-dom
+import { useNavigate } from 'react-router-dom';
 import './home.css';
 
 const Home = () => {
-  const navigate = useNavigate(); // Initialiseer navigate
+  const navigate = useNavigate();
 
-  const handleNextPage = () => {
-    // Navigeer naar de juiste pagina wanneer de knop wordt geklikt
+  const handleNewGame = () => {
+    const gameId = generateGameId();
+    navigate(`/newGame/${gameId}`);
+  };
+
+  const handleJoinGame = () => {
     navigate('/account');
+  };
+
+  const generateGameId = () => {
+    return Math.floor(Math.random() * 10000).toString();
   };
 
   return (
@@ -24,9 +32,8 @@ const Home = () => {
         Op de map kunnen ze zien waar ze naartoe moeten en met de QR-scanner kunnen ze hun points
       </p>
       <div>
-        {/* Gebruik onClick om de handleLogout-functie aan de knop te koppelen */}
-        <button className='button' onClick={handleNextPage}>Nieuw spel</button>   
-        <button className='button' onClick={handleNextPage}>Deelnemen</button>   
+        <button className='button' onClick={handleNewGame}>Nieuw spel</button>   
+        <button className='button' onClick={handleJoinGame}>Deelnemen</button>   
       </div>
     </div>
   );
