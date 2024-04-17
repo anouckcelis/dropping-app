@@ -9,7 +9,7 @@ const NewGame = () => {
   return (
     <div className="newGame-container">
       <h1>Het spel</h1>
-      <h2>Game ID: {gameId}</h2>
+      <h2>Spelcode: {gameId}</h2>
       <h3>Je bent een host van dit spel</h3>
       <p>
       De host in een spel heeft de controle en fungeert als jager, terwijl ze checkpoints instellen en de spelers volgen.
