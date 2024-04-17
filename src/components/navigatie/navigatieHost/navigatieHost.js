@@ -12,7 +12,7 @@ const NavigatieHost = ({gameId}) => {
         </div>
         <span>Home</span>
       </Link>
-      <Link to="/map" className="nav-link">
+      <Link to="/mapHost" className="nav-link">
         <div className="icon-container">
           <MdPlace size={24} color="#257eca" />
         </div>

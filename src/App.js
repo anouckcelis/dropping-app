@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Start from './start.js';
 import Login from './login.js';
 import Home from './home.js';
-import Map from './components/map/map.js';
+import MapHost from './components/map/mapHost/mapHost.js'
 import QRScanner from './components/scanner/qrscanner.js';
 import Account from './account.js';
 import Register from './register.js';
@@ -23,7 +23,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/map" element={<Map />} />
+          <Route path="/mapHost" element={<MapHost />} />
           <Route path="/qrscanner" element={<QRScanner/>} />
           <Route path="/account" element={<Account />} />
           <Route path="/newGame/:gameId" element={<NewGame />} />
