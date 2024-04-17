@@ -1,10 +1,17 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import Navigatie from '../src/components/navigatie/navigatie'
+import NavigatieHost from '../src/components/navigatie/navigatieHost/navigatieHost'; // Importeer de NavigatieHost-component
 import './newGame.css';
+import { useNavigate } from 'react-router-dom';
 
 const NewGame = () => {
   const { gameId } = useParams();
+  const navigate = useNavigate();
+
+  
+  const handleGoToCheckpoints = () => {
+    navigate('/checkpoints');
+  };
 
   return (
     <div className="newGame-container">
@@ -12,14 +19,15 @@ const NewGame = () => {
       <h2>Spelcode: {gameId}</h2>
       <h3>Je bent een host van dit spel</h3>
       <p>
-      De host in een spel heeft de controle en fungeert als jager, terwijl ze checkpoints instellen en de spelers volgen.
+        De host in een spel heeft de controle en fungeert als jager, terwijl ze checkpoints instellen en de spelers volgen.
       </p>
       <div>
-        <button className='button'>Stel checkpoints in</button> 
+        <button className='button' onClick={handleGoToCheckpoints}>Stel checkpoints in</button> 
       </div>
-      <Navigatie />
+      <NavigatieHost gameId={gameId} /> {/* Gebruik NavigatieHost-component met gameId */}
     </div>
   );
 };
 
 export default NewGame;
+

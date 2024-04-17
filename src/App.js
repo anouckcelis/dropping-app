@@ -7,7 +7,8 @@ import Map from './components/map/map.js';
 import QRScanner from './components/scanner/qrscanner.js';
 import Account from './account.js';
 import Register from './register.js';
-import NewGame from './newGame.js'; // Importeer NewGame component
+import NewGame from './newGame.js';
+import Checkpoints from './checkpoints.js';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/qrscanner" element={<QRScanner/>} />
           <Route path="/account" element={<Account />} />
           <Route path="/newGame/:gameId" element={<NewGame />} />
+          <Route path="/checkpoints" element={<Checkpoints />} />
 
         </Routes>
       </BrowserRouter>
