@@ -4,9 +4,11 @@ import Start from './start.js';
 import Login from './login.js';
 import Home from './home.js';
 import MapHost from './components/map/mapHost/mapHost.js';
-import MapPlayer from './components/map/mapPlayer/mapPlayer.js'
-import QRScanner from './components/scanner/qrscanner.js';
-import Account from './account.js';
+import MapPlayer from './components/map/mapPlayer/mapPlayer.js';
+import QRScannerHost from './components/scanner/scannerHost/qrscannerHost.js';
+import QRScannerPlayer from './components/scanner/scannerPlayer/qrscannerPlayer.js';
+import AccountHost from './components/account/accountHost/accountHost.js';
+import AccountPlayer from './components/account/accountPlayer/accountPlayer.js';
 import Register from './register.js';
 import NewGame from './newGame.js';
 import Checkpoints from './checkpoints.js';
@@ -27,8 +29,10 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/mapHost" element={<MapHost />} />
           <Route path="/mapPlayer" element={<MapPlayer />} />
-          <Route path="/qrscanner" element={<QRScanner/>} />
-          <Route path="/account" element={<Account />} />
+          <Route path="/qrscannerHost" element={<QRScannerHost/>} />
+          <Route path="/qrscannerPlayer" element={<QRScannerPlayer/>} />
+          <Route path="/accountHost" element={<AccountHost />} />
+          <Route path="/accountPlayer" element={<AccountPlayer />} />
           <Route path="/newGame/:gameId" element={<NewGame />} />
           <Route path="/checkpoints" element={<Checkpoints />} />
           <Route path="/participateGame" element={<ParticipateGame />} />

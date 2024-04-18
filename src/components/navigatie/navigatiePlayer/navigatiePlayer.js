@@ -18,7 +18,7 @@ const NavigatiePlayer = () => {
         </div>
         <span>Kaart</span>
       </Link>
-      <Link to="/qrscanner" className="nav-link">
+      <Link to="/qrscannerPlayer" className="nav-link">
         <div className="icon-container">
           <MdPhoneAndroid size={24} color="#257eca" />
         </div>

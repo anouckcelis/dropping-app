@@ -3,10 +3,10 @@ import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
 import { updateDoc, doc } from 'firebase/firestore'; 
 import { getFirestore } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import Navigatie from './components/navigatie/navigatie';
-import './account.css';
+import '../../account/accountHost/accountHost.css';
+import NavigatieHost from '../../navigatie/navigatieHost/navigatieHost';
 
-const Account = () => {
+const AccountHost = () => {
   const auth = getAuth();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -60,10 +60,18 @@ const Account = () => {
       <div>
         <button className='button' onClick={handleLogout}>Uitloggen</button>   
       </div>
-      <Navigatie />
+      <br />
+      <br />
+
+      <div>
+        <button className='button'>Ranglijst</button>  
+        <button className='button'>Logboek</button>   
+
+      </div>
+      <NavigatieHost />
     </div>
   );
 };
 
-export default Account;  
+export default AccountHost;  
 

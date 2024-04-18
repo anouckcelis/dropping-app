@@ -5,7 +5,7 @@
   align-items: center;
   height: 91vh;
   color: black;
-  background-image: url('./images/kaartachtergrond.png'); /* Vervang 'pad/naar/jouw/achtergrondfoto.jpg' door het juiste pad naar jouw afbeelding */
+  background-image: url('../../../images/kaartachtergrond.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

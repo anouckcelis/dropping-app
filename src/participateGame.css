@@ -41,7 +41,7 @@
         justify-content: center;
       }
     
-      input.inputBox {
+      input.inputBoxGameId {
         height: 60px;
         width: 220px;
         font-size: x-large;
@@ -63,5 +63,20 @@
         margin: 8px;
         font-size: 22px;
         align-self: center; /* Deze regel zal de knop in het midden van de pagina plaatsen */
+      }
+
+      .buttonHost {
+        border: none;
+        background: #257eca;
+        color: white;
+        padding: 12px 24px;
+        margin: 8px;
+        font-size: 22px;
+        
+
+      }
+
+      button.buttonHost {
+        align-self: center;
       }
       
