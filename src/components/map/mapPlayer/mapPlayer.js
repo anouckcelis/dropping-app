@@ -4,8 +4,9 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, doc, setDoc, getDocs } from 'firebase/firestore';
-import Navigatie from '../navigatie/navigatie';
-import './map.css';
+import '../../map/mapPlayer/mapPlayer.css'
+import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
+
 
 const MapPlayer = () => {
   const [userLocation, setUserLocation] = useState(null);
@@ -163,7 +164,7 @@ const MapPlayer = () => {
           ))}
         </MapContainer>
       </div>
-      <Navigatie />
+      <NavigatiePlayer />
     </div>
   );
 };

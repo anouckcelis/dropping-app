@@ -17,12 +17,12 @@ const NewGame = () => {
     <div className="newGame-container">
       <h1>Het spel</h1>
       <h2>Spelcode: {gameId}</h2>
-      <h3>Je bent een host van dit spel</h3>
+      <h3>Je bent een host in dit spel</h3>
       <p>
         De host in een spel heeft de controle en fungeert als jager, terwijl ze checkpoints instellen en de spelers volgen.
       </p>
       <div>
-        <button className='button' onClick={handleGoToCheckpoints}>Stel checkpoints in</button> 
+        <button className='buttonGo' onClick={handleGoToCheckpoints}>Stel checkpoints in</button> 
       </div>
       <NavigatieHost gameId={gameId} /> {/* Gebruik NavigatieHost-component met gameId */}
     </div>

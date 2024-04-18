@@ -11,7 +11,7 @@ const Home = () => {
   };
 
   const handleJoinGame = () => {
-    navigate('/account');
+    navigate('/participateGame');
   };
 
   const generateGameId = () => {

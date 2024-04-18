@@ -1,0 +1,67 @@
+.participateGame-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    align-items: center;
+    height: 91vh;
+    color: black;
+    background-image: url('./images/kaartachtergrond.png'); /* Vervang 'pad/naar/jouw/achtergrondfoto.jpg' door het juiste pad naar jouw afbeelding */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba(255, 255, 255, 0.8); /* Als je een deel van de achtergrondafbeelding wilt zien, kun je de achtergrondkleur met een lage dekking instellen */
+    }
+    
+
+    h1, h4 {
+      color: 
+      #257eca;
+    }
+    
+    p {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    
+    h3 {
+      margin-top: 10px;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    h2 {
+        text-align: center;
+        font-size: 18px;
+    }
+
+    .inputContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+      }
+    
+      input.inputBox {
+        height: 60px;
+        width: 220px;
+        font-size: x-large;
+        border-radius: 8px;
+        border: 1px solid grey;
+        margin-top: 15px;
+        text-align: center;
+      }
+
+      label {
+        margin-bottom: 2px;
+      }
+
+      .buttonGo {
+        border: none;
+        background: #257eca;
+        color: white;
+        padding: 12px 24px;
+        margin: 8px;
+        font-size: 22px;
+        align-self: center; /* Deze regel zal de knop in het midden van de pagina plaatsen */
+      }
+      
