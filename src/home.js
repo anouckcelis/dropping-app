@@ -5,12 +5,14 @@ import './home.css';
 import { auth } from './firebase'; // Importeer de auth-instantie van Firebase
 
 const Home = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Navigatiehaak gebruiken om door de app te navigeren
 
+  // Functie om een willekeurige gameId te genereren
   const generateGameId = () => {
     return Math.floor(Math.random() * 10000).toString();
   };
 
+  // Functie om gameId toe te voegen aan checkpoints in de database
   const addGameIdToCheckpoints = async (db, gameId) => {
     try {
       await addDoc(collection(db, 'checkpoints'), { gameId });
@@ -19,40 +21,39 @@ const Home = () => {
     }
   };
 
+  // Functie om een nieuw spel te maken
   const handleNewGame = async () => {
     const gameId = generateGameId(); // Genereer gameId
 
     try {
-      const db = getFirestore();
+      const db = getFirestore(); // Firestore-instantie verkrijgen
 
-      // Voeg gameId toe aan de games-collectie
-      const gameRef = await addDoc(collection(db, 'games'), { gameId });
+      const gameRef = await addDoc(collection(db, 'games'), { gameId }); // Spel toevoegen aan de database
 
-      // Voeg gameId toe aan de checkpoints-collectie
-      await addGameIdToCheckpoints(db, gameId);
+      await addGameIdToCheckpoints(db, gameId); // gameId toevoegen aan checkpoints
 
-      const user = auth.currentUser; // Haal de huidige gebruiker op
-      if (user) { // Controleer of de gebruiker is ingelogd
-        const email = user.email; // Haal de e-mail van de gebruiker op
-        
-        // Voeg de gebruiker toe aan de players-collectie als host
+      const user = auth.currentUser; // Huidige gebruiker ophalen
+      if (user) { // Controleren of de gebruiker is ingelogd
+        const email = user.email; // E-mailadres van de gebruiker
+
+        // Speler toevoegen aan de database met rol 'host'
         await addDoc(collection(db, 'players'), { email, gameId, role: 'host' });
       } else {
-        console.error('Gebruiker is niet ingelogd.');
-        // Voeg hier eventueel een foutmelding toe voor de gebruiker
+        console.error('Gebruiker is niet ingelogd.'); // Foutmelding als de gebruiker niet is ingelogd
       }
 
-      navigate(`/newGame/${gameId}`);
+      navigate(`/newGame/${gameId}`); // Navigeren naar de nieuwe gamepagina met gameId
     } catch (error) {
-      console.error('Fout bij het maken van het spel:', error);
-      // Voeg hier eventueel een foutmelding toe voor de gebruiker
+      console.error('Fout bij het maken van het spel:', error); // Foutmelding bij het maken van het spel
     }
   };
 
+  // Functie om aan een spel deel te nemen
   const handleJoinGame = () => {
-    navigate('/participateGame');
+    navigate('/participateGame'); // Navigeren naar de pagina om aan een spel deel te nemen
   };
 
+  // JSX retourneren voor de Home-component
   return (
     <div className="dashboard-container">
       <h1>Hallo!</h1>
@@ -66,6 +67,7 @@ const Home = () => {
         De players moeten zo snel mogelijk via checkpoints het einde bereiken en dat door uit de handen te blijven van de hosts. Wanneer ze gecatcht worden beginnen ze terug bij start.
         Op de map kunnen ze zien waar ze naartoe moeten en met de QR-scanner kunnen ze hun points
       </p>
+      {/* Knoppen voor het maken van een nieuw spel en het deelnemen aan een spel */}
       <div>
         <button className='button' onClick={handleNewGame}>Nieuw spel</button>   
         <button className='button' onClick={handleJoinGame}>Deelnemen</button>   
@@ -75,3 +77,4 @@ const Home = () => {
 };
 
 export default Home;
+
