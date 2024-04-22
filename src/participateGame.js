@@ -1,43 +1,63 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFirestore, collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import NavigatiePlayer from '../src/components/navigatie/navigatiePlayer/navigatiePlayer';
 import './participateGame.css';
-import { auth, firestore } from './firebase'; // Importeer de auth-instantie en firestore-instantie van Firebase
+import { auth, firestore } from './firebase';
 
 const ParticipateGame = () => {
   const [gameId, setGameId] = useState('');
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isHostSelected, setIsHostSelected] = useState(false);
+  const [role, setRole] = useState('player');
+  const [playerEmail, setPlayerEmail] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const db = getFirestore(); // Haal Firestore-instantie op
+  const db = getFirestore();
 
   const startGame = async () => {
-    // Zoek de gameId op in de database
     const gameQuery = query(collection(db, 'games'), where('gameId', '==', gameId));
     const querySnapshot = await getDocs(gameQuery);
 
-    if (!querySnapshot.empty) { // Als er een gameId is gevonden
-      const user = auth.currentUser; // Haal de huidige gebruiker op
-      if (user) { // Controleer of de gebruiker is ingelogd
-        const email = user.email; // Haal de e-mail van de gebruiker op
-        // Voeg de gebruiker toe aan de players-collectie met hun e-mail
-        await addDoc(collection(db, 'players'), { email, gameId });
-        setIsGameStarted(true); // Zet isGameStarted op true
+    if (!querySnapshot.empty) {
+      const user = auth.currentUser;
+      if (user) {
+        const email = user.email;
+        await addDoc(collection(db, 'players'), { email, gameId, role: 'player' });
+        setIsGameStarted(true);
+        setPlayerEmail(email);
       } else {
         console.error('Gebruiker is niet ingelogd.');
-        // Voeg hier eventueel een foutmelding toe voor de gebruiker
       }
     } else {
-      console.error('GameId niet gevonden.');
-      // Voeg hier eventueel een foutmelding toe voor de gebruiker
+      setErrorMessage('GameId is fout.');
     }
   };
 
-  const handleBecomeHost = () => {
-    // Stuur de gebruiker door naar de hostpagina met de gameId
-    navigate(`/newGame/${gameId}`);
+  const handleBecomeHost = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const email = user.email;
+        const playerQuery = query(collection(db, 'players'), where('email', '==', email));
+        const playerQuerySnapshot = await getDocs(playerQuery);
+        if (!playerQuerySnapshot.empty) {
+          const playerDocRef = playerQuerySnapshot.docs[0].ref; // Haal de referentie naar het document op
+          await updateDoc(playerDocRef, { role: 'host' });
+          setRole('host');
+          setIsHostSelected(true);
+          navigate(`/newGame/${gameId}`);
+        } else {
+          console.error('Spelerdocument niet gevonden.');
+        }
+      } else {
+        console.error('Gebruiker is niet ingelogd.');
+      }
+    } catch (error) {
+      console.error('Fout bij het updaten van de rol:', error);
+    }
   };
+  
 
   return (
     <div className="participateGame-container">
@@ -59,7 +79,7 @@ const ParticipateGame = () => {
             onChange={(e) => setGameId(e.target.value)}
           />
           <button className='buttonGo' onClick={startGame}>Ga naar spel</button>
-          <NavigatiePlayer gameId={gameId} /> {/* Toon NavigatiePlayer-component samen met het invoerformulier */}
+          <NavigatiePlayer gameId={gameId} />
         </div>
       )}
 
@@ -69,16 +89,17 @@ const ParticipateGame = () => {
           <br/>
           <h3> GameId: </h3>
           <h2>{gameId}</h2>
-          {!isHostSelected && ( // Toon de knop "Ik wil ook host zijn" als de gebruiker nog niet heeft gekozen om host te zijn
+          {!isHostSelected && (
             <button className='buttonHost' onClick={handleBecomeHost}>Ik wil ook host zijn</button>
           )}
         </div>
       )}
 
-      <NavigatiePlayer gameId={gameId} /> {/* Toon NavigatiePlayer-component nadat het spel is gestart */}
+      {errorMessage && <p>{errorMessage}</p>}
+
+      <NavigatiePlayer gameId={gameId} />
     </div>
   );
 };
 
 export default ParticipateGame;
-

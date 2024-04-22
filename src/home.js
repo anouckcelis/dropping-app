@@ -1,6 +1,8 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import './home.css';
+import { auth } from './firebase'; // Importeer de auth-instantie van Firebase
 
 const Home = () => {
   const navigate = useNavigate();
@@ -23,13 +25,27 @@ const Home = () => {
     try {
       const db = getFirestore();
 
+      // Voeg gameId toe aan de games-collectie
       const gameRef = await addDoc(collection(db, 'games'), { gameId });
 
+      // Voeg gameId toe aan de checkpoints-collectie
       await addGameIdToCheckpoints(db, gameId);
+
+      const user = auth.currentUser; // Haal de huidige gebruiker op
+      if (user) { // Controleer of de gebruiker is ingelogd
+        const email = user.email; // Haal de e-mail van de gebruiker op
+        
+        // Voeg de gebruiker toe aan de players-collectie als host
+        await addDoc(collection(db, 'players'), { email, gameId, role: 'host' });
+      } else {
+        console.error('Gebruiker is niet ingelogd.');
+        // Voeg hier eventueel een foutmelding toe voor de gebruiker
+      }
 
       navigate(`/newGame/${gameId}`);
     } catch (error) {
       console.error('Fout bij het maken van het spel:', error);
+      // Voeg hier eventueel een foutmelding toe voor de gebruiker
     }
   };
 
