@@ -14,6 +14,7 @@ import NewGame from './newGame.js';
 import Checkpoints from './checkpoints.js';
 import ParticipateGame from './participateGame.js'
 import './App.css';
+import firebase from './firebase.js'
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);

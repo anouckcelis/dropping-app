@@ -1,21 +1,45 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
+// Importeer de nodige functies van Firebase
+import { auth, firestore } from './firebase.js';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import './home.css';
 
 const Home = () => {
   const navigate = useNavigate();
 
-  const handleNewGame = () => {
+  const handleNewGame = async () => {
     const gameId = generateGameId();
-    navigate(`/newGame/${gameId}`);
-  };
 
-  const handleJoinGame = () => {
-    navigate('/participateGame');
+    try {
+      // Haal Firestore instantie op
+      const db = getFirestore();
+
+      // Schrijf de gameId naar Firestore onder 'games'
+      const gameRef = await addDoc(collection(db, 'games'), { gameId });
+
+      // Navigeer naar de nieuwe gamepagina met de gegenereerde gameId
+      navigate(`/newGame/${gameId}`);
+
+      // Voeg de gameId toe aan de geopunten (voorbeeld)
+      // Opmerking: Voeg de gameId toe aan geopunten wanneer ze aan het spel worden toegevoegd
+      // await addDoc(collection(db, 'geopoints'), { latitude, longitude, description, gameId });
+
+      // Voeg de gameId toe aan de spelers (voorbeeld)
+      // Opmerking: Voeg de gameId toe aan spelers wanneer ze aan het spel worden toegevoegd
+      // await addDoc(collection(db, 'players'), { name, role, gameId });
+    } catch (error) {
+      console.error('Fout bij het maken van het spel:', error);
+      // Voeg hier eventueel een foutmelding toe voor de gebruiker
+    }
   };
 
   const generateGameId = () => {
     return Math.floor(Math.random() * 10000).toString();
+  };
+
+  const handleJoinGame = () => {
+    navigate('/participateGame');
   };
 
   return (
