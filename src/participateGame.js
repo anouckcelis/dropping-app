@@ -1,16 +1,37 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importeer useNavigate om de gebruiker door te sturen naar een andere pagina
+import { useNavigate } from 'react-router-dom';
+import { getFirestore, collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import NavigatiePlayer from '../src/components/navigatie/navigatiePlayer/navigatiePlayer';
 import './participateGame.css';
+import { auth, firestore } from './firebase'; // Importeer de auth-instantie en firestore-instantie van Firebase
 
 const ParticipateGame = () => {
   const [gameId, setGameId] = useState('');
   const [isGameStarted, setIsGameStarted] = useState(false);
-  const [isHostSelected, setIsHostSelected] = useState(false); // State om bij te houden of de gebruiker heeft gekozen om host te zijn
-  const navigate = useNavigate(); // Haal de navigate hook op
+  const [isHostSelected, setIsHostSelected] = useState(false);
+  const navigate = useNavigate();
+  const db = getFirestore(); // Haal Firestore-instantie op
 
-  const startGame = () => {
-    setIsGameStarted(true);
+  const startGame = async () => {
+    // Zoek de gameId op in de database
+    const gameQuery = query(collection(db, 'games'), where('gameId', '==', gameId));
+    const querySnapshot = await getDocs(gameQuery);
+
+    if (!querySnapshot.empty) { // Als er een gameId is gevonden
+      const user = auth.currentUser; // Haal de huidige gebruiker op
+      if (user) { // Controleer of de gebruiker is ingelogd
+        const email = user.email; // Haal de e-mail van de gebruiker op
+        // Voeg de gebruiker toe aan de players-collectie met hun e-mail
+        await addDoc(collection(db, 'players'), { email, gameId });
+        setIsGameStarted(true); // Zet isGameStarted op true
+      } else {
+        console.error('Gebruiker is niet ingelogd.');
+        // Voeg hier eventueel een foutmelding toe voor de gebruiker
+      }
+    } else {
+      console.error('GameId niet gevonden.');
+      // Voeg hier eventueel een foutmelding toe voor de gebruiker
+    }
   };
 
   const handleBecomeHost = () => {
