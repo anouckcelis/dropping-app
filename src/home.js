@@ -9,14 +9,6 @@ const Home = () => {
     return Math.floor(Math.random() * 10000).toString();
   };
 
-  const addGameIdToPlayers = async (db, gameId) => {
-    try {
-      await addDoc(collection(db, 'players'), { gameId });
-    } catch (error) {
-      console.error('Fout bij het toevoegen van gameId aan spelers:', error);
-    }
-  };
-
   const addGameIdToCheckpoints = async (db, gameId) => {
     try {
       await addDoc(collection(db, 'checkpoints'), { gameId });
@@ -32,8 +24,6 @@ const Home = () => {
       const db = getFirestore();
 
       const gameRef = await addDoc(collection(db, 'games'), { gameId });
-
-      await addGameIdToPlayers(db, gameId);
 
       await addGameIdToCheckpoints(db, gameId);
 
