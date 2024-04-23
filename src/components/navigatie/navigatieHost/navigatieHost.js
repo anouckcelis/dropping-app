@@ -18,7 +18,7 @@ const NavigatieHost = ({gameId}) => {
         </div>
         <span>Kaart</span>
       </Link>
-      <Link to="/checkpoints" className="nav-link">
+      <Link to={`/checkpoints/${gameId}`}  className="nav-link">
         <div className="icon-container">
           <MdFlag size={24} color="#257eca" /> 
         </div>

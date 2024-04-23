@@ -35,7 +35,7 @@ function App() {
           <Route path="/accountHost" element={<AccountHost />} />
           <Route path="/accountPlayer" element={<AccountPlayer />} />
           <Route path="/newGame/:gameId" element={<NewGame />} />
-          <Route path="/checkpoints" element={<Checkpoints />} />
+          <Route path="/checkpoints/:gameId" element={<Checkpoints />} />
           <Route path="/participateGame" element={<ParticipateGame />} />
 
         </Routes>

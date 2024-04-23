@@ -1,16 +1,15 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import NavigatieHost from '../src/components/navigatie/navigatieHost/navigatieHost'; // Importeer de NavigatieHost-component
+import NavigatieHost from '../src/components/navigatie/navigatieHost/navigatieHost'; 
 import './newGame.css';
 import { useNavigate } from 'react-router-dom';
 
 const NewGame = () => {
   const { gameId } = useParams();
   const navigate = useNavigate();
-
   
   const handleGoToCheckpoints = () => {
-    navigate('/checkpoints');
+    navigate(`/checkpoints/${gameId}`);
   };
 
   return (
@@ -24,7 +23,7 @@ const NewGame = () => {
       <div>
         <button className='buttonGo' onClick={handleGoToCheckpoints}>Stel checkpoints in</button> 
       </div>
-      <NavigatieHost gameId={gameId} /> {/* Gebruik NavigatieHost-component met gameId */}
+      <NavigatieHost gameId={gameId} />
     </div>
   );
 };

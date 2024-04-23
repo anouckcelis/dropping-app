@@ -12,15 +12,6 @@ const Home = () => {
     return Math.floor(Math.random() * 10000).toString();
   };
 
-  // Functie om gameId toe te voegen aan checkpoints in de database
-  const addGameIdToCheckpoints = async (db, gameId) => {
-    try {
-      await addDoc(collection(db, 'checkpoints'), { gameId });
-    } catch (error) {
-      console.error('Fout bij het toevoegen van gameId aan checkpoints:', error);
-    }
-  };
-
   // Functie om een nieuw spel te maken
   const handleNewGame = async () => {
     const gameId = generateGameId(); // Genereer gameId
@@ -30,7 +21,6 @@ const Home = () => {
 
       const gameRef = await addDoc(collection(db, 'games'), { gameId }); // Spel toevoegen aan de database
 
-      await addGameIdToCheckpoints(db, gameId); // gameId toevoegen aan checkpoints
 
       const user = auth.currentUser; // Huidige gebruiker ophalen
       if (user) { // Controleren of de gebruiker is ingelogd
