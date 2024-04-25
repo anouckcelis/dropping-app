@@ -2,48 +2,41 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import './home.css';
-import { auth } from './firebase'; // Importeer de auth-instantie van Firebase
+import { auth } from './firebase';
 
 const Home = () => {
-  const navigate = useNavigate(); // Navigatiehaak gebruiken om door de app te navigeren
+  const navigate = useNavigate();
 
-  // Functie om een willekeurige gameId te genereren
   const generateGameId = () => {
     return Math.floor(Math.random() * 10000).toString();
   };
 
-  // Functie om een nieuw spel te maken
   const handleNewGame = async () => {
-    const gameId = generateGameId(); // Genereer gameId
+    const gameId = generateGameId();
 
     try {
-      const db = getFirestore(); // Firestore-instantie verkrijgen
+      const db = getFirestore();
 
-      const gameRef = await addDoc(collection(db, 'games'), { gameId }); // Spel toevoegen aan de database
+      const gameRef = await addDoc(collection(db, 'games'), { gameId });
 
-
-      const user = auth.currentUser; // Huidige gebruiker ophalen
-      if (user) { // Controleren of de gebruiker is ingelogd
-        const email = user.email; // E-mailadres van de gebruiker
-
-        // Speler toevoegen aan de database met rol 'host'
+      const user = auth.currentUser;
+      if (user) {
+        const email = user.email;
         await addDoc(collection(db, 'players'), { email, gameId, role: 'host' });
       } else {
-        console.error('Gebruiker is niet ingelogd.'); // Foutmelding als de gebruiker niet is ingelogd
+        console.error('Gebruiker is niet ingelogd.');
       }
 
-      navigate(`/newGame/${gameId}`); // Navigeren naar de nieuwe gamepagina met gameId
+      navigate(`/newGame/${gameId}`);
     } catch (error) {
-      console.error('Fout bij het maken van het spel:', error); // Foutmelding bij het maken van het spel
+      console.error('Fout bij het maken van het spel:', error);
     }
   };
 
-  // Functie om aan een spel deel te nemen
   const handleJoinGame = () => {
-    navigate('/participateGame'); // Navigeren naar de pagina om aan een spel deel te nemen
+    navigate('/participateGame');
   };
 
-  // JSX retourneren voor de Home-component
   return (
     <div className="dashboard-container">
       <h1>Hallo!</h1>
@@ -57,7 +50,6 @@ const Home = () => {
         De players moeten zo snel mogelijk via checkpoints het einde bereiken en dat door uit de handen te blijven van de hosts. Wanneer ze gecatcht worden beginnen ze terug bij start.
         Op de map kunnen ze zien waar ze naartoe moeten en met de QR-scanner kunnen ze hun points
       </p>
-      {/* Knoppen voor het maken van een nieuw spel en het deelnemen aan een spel */}
       <div>
         <button className='button' onClick={handleNewGame}>Nieuw spel</button>   
         <button className='button' onClick={handleJoinGame}>Deelnemen</button>   

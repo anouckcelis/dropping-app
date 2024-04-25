@@ -28,8 +28,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/mapHost" element={<MapHost />} />
-          <Route path="/mapPlayer" element={<MapPlayer />} />
+          <Route path="/mapHost/:gameId" element={<MapHost />} />
+          <Route path="/mapPlayer/:gameId" element={<MapPlayer />} />
           <Route path="/qrscannerHost" element={<QRScannerHost/>} />
           <Route path="/qrscannerPlayer" element={<QRScannerPlayer/>} />
           <Route path="/accountHost" element={<AccountHost />} />

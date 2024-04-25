@@ -3,14 +3,18 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, getDocs } from 'firebase/firestore';
-import '../../map/mapHost/mapHost.css'
+import { getFirestore, collection, doc, setDoc, getDocs, where, query } from 'firebase/firestore';
+import '../../map/mapPlayer/mapPlayer.css';
+import { Icon } from 'leaflet';
 import NavigatieHost from '../../navigatie/navigatieHost/navigatieHost';
+import { useParams } from 'react-router-dom';
 
 const MapHost = () => {
+  const { gameId } = useParams();
   const [userLocation, setUserLocation] = useState(null);
   const [nearbyUsers, setNearbyUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
+  const [checkpoints, setCheckpoints] = useState([]);
 
   useEffect(() => {
     const auth = getAuth();
@@ -18,7 +22,8 @@ const MapHost = () => {
       if (user) {
         fetchUserLocation();
         setCurrentUserEmail(user.email);
-        markUserAsLogged(user.uid); // Markeer de huidige gebruiker als ingelogd
+        markUserAsLogged(user.uid);
+        fetchCheckpoints();
       }
     });
 
@@ -26,20 +31,13 @@ const MapHost = () => {
   }, []);
 
   useEffect(() => {
-    if (userLocation) {
-      fetchNearbyUsers();
-    }
-  }, [userLocation]);
-
-  useEffect(() => {
-    // Update elke 3 minuten
     const intervalId = setInterval(() => {
       if (userLocation) {
         fetchNearbyUsers();
       }
-    }, 1 * 60 * 1000); 
+    }, 60 * 1000);
 
-    return () => clearInterval(intervalId); // Clear interval bij het unmounten
+    return () => clearInterval(intervalId);
   }, [userLocation]);
 
   const fetchUserLocation = () => {
@@ -48,12 +46,11 @@ const MapHost = () => {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       });
-      updateUserLocation(getAuth().currentUser.uid, position.coords.latitude, position.coords.longitude, getAuth().currentUser.email); // E-mail wordt hier rechtstreeks doorgegeven
+      updateUserLocation(getAuth().currentUser.uid, position.coords.latitude, position.coords.longitude, getAuth().currentUser.email);
     }, error => {
       console.error('Failed to fetch user location:', error);
     });
   };
-  
 
   const fetchNearbyUsers = async () => {
     if (!userLocation) return;
@@ -70,7 +67,6 @@ const MapHost = () => {
         const userData = doc.data();
         const distance = calculateDistance(userLocation.lat, userLocation.lng, userData.lat, userData.lng);
 
-        // Alleen gebruikers met "isLogged" ingesteld op true weergeven
         if (distance <= maxDistance && userData.isLogged && userData.email !== currentUserEmail) {
           nearbyUsersData.push(userData);
         }
@@ -79,6 +75,27 @@ const MapHost = () => {
       setNearbyUsers(nearbyUsersData);
     } catch (error) {
       console.error("Error fetching nearby users:", error);
+    }
+  };
+
+  const fetchCheckpoints = async () => {
+    const db = getFirestore();
+    const checkpointsRef = collection(db, 'checkpoints');
+    let checkpointsData = [];
+
+    try {
+      if (gameId) {
+        const q = query(checkpointsRef, where("gameId", "==", gameId));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(doc => {
+          const checkpointData = doc.data();
+          checkpointsData.push(checkpointData);
+        });
+      }
+      
+      setCheckpoints(checkpointsData);
+    } catch (error) {
+      console.error("Error fetching checkpoints:", error);
     }
   };
 
@@ -114,12 +131,12 @@ const MapHost = () => {
   const updateUserLocation = (userId, lat, lng, email) => {
     const db = getFirestore();
     const userDocRef = doc(db, 'userLocations', userId);
-  
+
     setDoc(userDocRef, {
       email: email,
       lat: lat,
       lng: lng,
-      isLogged: true // Markeren als ingelogd bij het bijwerken van locatie
+      isLogged: true
     }, { merge: true })
       .then(() => {
         console.log("User location updated in Firestore!");
@@ -136,6 +153,13 @@ const MapHost = () => {
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
+  });
+
+  const checkpointIcon = new Icon ({
+    iconUrl : 'https://img.icons8.com/doodle/flag.png',
+    iconSize : [35, 35],
+    iconAnchor : [22, 94],
+    popupAnchor : [-3, -76]
   });
 
   return (
@@ -161,6 +185,13 @@ const MapHost = () => {
               </Popup>
             </Marker>
           ))}
+          {checkpoints.map((checkpoint, index) => (
+            <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={checkpointIcon}>
+              <Popup>
+                <p>{checkpoint.name}</p>
+              </Popup>
+            </Marker>
+          ))}
         </MapContainer>
       </div>
       <NavigatieHost />
@@ -169,3 +200,4 @@ const MapHost = () => {
 };
 
 export default MapHost;
+

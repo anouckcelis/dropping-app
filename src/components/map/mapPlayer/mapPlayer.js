@@ -4,14 +4,15 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, doc, setDoc, getDocs } from 'firebase/firestore';
-import '../../map/mapPlayer/mapPlayer.css'
+import '../../map/mapPlayer/mapPlayer.css';
+import { Icon } from 'leaflet';
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
-
 
 const MapPlayer = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [nearbyUsers, setNearbyUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
+  const [checkpoints, setCheckpoints] = useState([]);
 
   useEffect(() => {
     const auth = getAuth();
@@ -20,6 +21,7 @@ const MapPlayer = () => {
         fetchUserLocation();
         setCurrentUserEmail(user.email);
         markUserAsLogged(user.uid); // Markeer de huidige gebruiker als ingelogd
+        fetchCheckpoints();
       }
     });
 
@@ -27,18 +29,12 @@ const MapPlayer = () => {
   }, []);
 
   useEffect(() => {
-    if (userLocation) {
-      fetchNearbyUsers();
-    }
-  }, [userLocation]);
-
-  useEffect(() => {
-    // Update elke 3 minuten
+    // Update elke minuut
     const intervalId = setInterval(() => {
       if (userLocation) {
         fetchNearbyUsers();
       }
-    }, 1 * 60 * 1000); 
+    }, 60 * 1000); // Elke minuut
 
     return () => clearInterval(intervalId); // Clear interval bij het unmounten
   }, [userLocation]);
@@ -54,7 +50,6 @@ const MapPlayer = () => {
       console.error('Failed to fetch user location:', error);
     });
   };
-  
 
   const fetchNearbyUsers = async () => {
     if (!userLocation) return;
@@ -80,6 +75,25 @@ const MapPlayer = () => {
       setNearbyUsers(nearbyUsersData);
     } catch (error) {
       console.error("Error fetching nearby users:", error);
+    }
+  };
+
+  const fetchCheckpoints = async () => {
+    const db = getFirestore();
+    const checkpointsRef = collection(db, 'checkpoints');
+
+    try {
+      const querySnapshot = await getDocs(checkpointsRef);
+      const checkpointsData = [];
+
+      querySnapshot.forEach(doc => {
+        const checkpointData = doc.data();
+        checkpointsData.push(checkpointData);
+      });
+
+      setCheckpoints(checkpointsData);
+    } catch (error) {
+      console.error("Error fetching checkpoints:", error);
     }
   };
 
@@ -115,7 +129,7 @@ const MapPlayer = () => {
   const updateUserLocation = (userId, lat, lng, email) => {
     const db = getFirestore();
     const userDocRef = doc(db, 'userLocations', userId);
-  
+
     setDoc(userDocRef, {
       email: email,
       lat: lat,
@@ -139,6 +153,13 @@ const MapPlayer = () => {
     shadowSize: [41, 41]
   });
 
+  const checkpointIcon = new Icon ({
+    iconUrl : 'https://img.icons8.com/doodle/48/flag.png',
+    iconSize : [35, 35], // size of the icon
+    iconAnchor : [22, 94], // point of the icon which will correspond to marker's location
+    popupAnchor : [-3, -76] // point from which the popup should open relative to the iconAnchor
+  });
+
   return (
     <div className="map-wrapper">
       <div className="map-container">
@@ -159,6 +180,13 @@ const MapPlayer = () => {
             <Marker key={index} position={[user.lat, user.lng]} icon={icon}>
               <Popup>
                 <p>{user.email}</p>
+              </Popup>
+            </Marker>
+          ))}
+          {checkpoints.map((checkpoint, index) => (
+            <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={checkpointIcon}>
+              <Popup>
+                <p>{checkpoint.name}</p>
               </Popup>
             </Marker>
           ))}
