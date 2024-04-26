@@ -3,7 +3,7 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import '../../scanner/scannerHost/qrscannerHost.css';
 import NavigatieHost from '../../navigatie/navigatieHost/navigatieHost';
 
-const QRScannerHost = () => {
+const QRScannerHost = ({ gameId }) => {
     const [scanResult, setScanResult] = useState(null);
     const scannerRef = useRef(null);
      
@@ -53,7 +53,7 @@ const QRScannerHost = () => {
                     <button className="button-opnieuw" onClick={handleScanAgain}>Opnieuw scannen</button>
                 </div>
             ) : null}
-            <NavigatieHost />
+            <NavigatieHost gameId={gameId} />
         </div>
     );
 };

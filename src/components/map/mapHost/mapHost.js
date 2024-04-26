@@ -197,7 +197,7 @@ const MapHost = () => {
           ))}
         </MapContainer>
       </div>
-      <NavigatieHost />
+      <NavigatieHost gameId={gameId} />
     </div>
   );
 };

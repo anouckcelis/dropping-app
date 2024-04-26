@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../account/accountHost/accountHost.css';
 import NavigatieHost from '../../navigatie/navigatieHost/navigatieHost';
 
-const AccountHost = () => {
+const AccountHost = ({ gameId }) => {
   const auth = getAuth();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -68,7 +68,7 @@ const AccountHost = () => {
         <button className='button'>Logboek</button>   
 
       </div>
-      <NavigatieHost />
+      <NavigatieHost gameId={gameId} />
     </div>
   );
 };

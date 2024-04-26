@@ -3,10 +3,11 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, getDocs, where, query } from 'firebase/firestore';
 import '../../map/mapPlayer/mapPlayer.css';
 import { Icon } from 'leaflet';
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
+import { useParams } from 'react-router-dom';
 
 const MapPlayer = () => {
   const [userLocation, setUserLocation] = useState(null);
@@ -14,13 +15,15 @@ const MapPlayer = () => {
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [checkpoints, setCheckpoints] = useState([]);
 
+  const { gameId } = useParams();
+
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchUserLocation();
         setCurrentUserEmail(user.email);
-        markUserAsLogged(user.uid); // Markeer de huidige gebruiker als ingelogd
+        markUserAsLogged(user.uid);
         fetchCheckpoints();
       }
     });
@@ -29,14 +32,13 @@ const MapPlayer = () => {
   }, []);
 
   useEffect(() => {
-    // Update elke minuut
     const intervalId = setInterval(() => {
       if (userLocation) {
         fetchNearbyUsers();
       }
-    }, 60 * 1000); // Elke minuut
+    }, 60 * 1000);
 
-    return () => clearInterval(intervalId); // Clear interval bij het unmounten
+    return () => clearInterval(intervalId);
   }, [userLocation]);
 
   const fetchUserLocation = () => {
@@ -45,7 +47,7 @@ const MapPlayer = () => {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       });
-      updateUserLocation(getAuth().currentUser.uid, position.coords.latitude, position.coords.longitude, getAuth().currentUser.email); // E-mail wordt hier rechtstreeks doorgegeven
+      updateUserLocation(getAuth().currentUser.uid, position.coords.latitude, position.coords.longitude, getAuth().currentUser.email);
     }, error => {
       console.error('Failed to fetch user location:', error);
     });
@@ -66,7 +68,6 @@ const MapPlayer = () => {
         const userData = doc.data();
         const distance = calculateDistance(userLocation.lat, userLocation.lng, userData.lat, userData.lng);
 
-        // Alleen gebruikers met "isLogged" ingesteld op true weergeven
         if (distance <= maxDistance && userData.isLogged && userData.email !== currentUserEmail) {
           nearbyUsersData.push(userData);
         }
@@ -81,16 +82,18 @@ const MapPlayer = () => {
   const fetchCheckpoints = async () => {
     const db = getFirestore();
     const checkpointsRef = collection(db, 'checkpoints');
+    let checkpointsData = [];
 
     try {
-      const querySnapshot = await getDocs(checkpointsRef);
-      const checkpointsData = [];
-
-      querySnapshot.forEach(doc => {
-        const checkpointData = doc.data();
-        checkpointsData.push(checkpointData);
-      });
-
+      if (gameId) {
+        const q = query(checkpointsRef, where("gameId", "==", gameId));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(doc => {
+          const checkpointData = doc.data();
+          checkpointsData.push(checkpointData);
+        });
+      }
+      
       setCheckpoints(checkpointsData);
     } catch (error) {
       console.error("Error fetching checkpoints:", error);
@@ -134,7 +137,7 @@ const MapPlayer = () => {
       email: email,
       lat: lat,
       lng: lng,
-      isLogged: true // Markeren als ingelogd bij het bijwerken van locatie
+      isLogged: true
     }, { merge: true })
       .then(() => {
         console.log("User location updated in Firestore!");
@@ -155,9 +158,9 @@ const MapPlayer = () => {
 
   const checkpointIcon = new Icon ({
     iconUrl : 'https://img.icons8.com/doodle/48/flag.png',
-    iconSize : [35, 35], // size of the icon
-    iconAnchor : [22, 94], // point of the icon which will correspond to marker's location
-    popupAnchor : [-3, -76] // point from which the popup should open relative to the iconAnchor
+    iconSize : [35, 35],
+    iconAnchor : [22, 94],
+    popupAnchor : [-3, -76]
   });
 
   return (
@@ -192,9 +195,10 @@ const MapPlayer = () => {
           ))}
         </MapContainer>
       </div>
-      <NavigatiePlayer />
+      <NavigatiePlayer gameId={gameId}/>
     </div>
   );
 };
 
 export default MapPlayer;
+
