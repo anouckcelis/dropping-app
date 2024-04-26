@@ -30,10 +30,10 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/mapHost/:gameId" element={<MapHost />} />
           <Route path="/mapPlayer/:gameId" element={<MapPlayer />} />
-          <Route path="/qrscannerHost" element={<QRScannerHost/>} />
-          <Route path="/qrscannerPlayer" element={<QRScannerPlayer/>} />
-          <Route path="/accountHost" element={<AccountHost />} />
-          <Route path="/accountPlayer" element={<AccountPlayer />} />
+          <Route path="/qrscannerHost/:gameId" element={<QRScannerHost/>} />
+          <Route path="/qrscannerPlayer/:gameId" element={<QRScannerPlayer/>} />
+          <Route path="/accountHost/:gameId" element={<AccountHost />} />
+          <Route path="/accountPlayer/:gameId" element={<AccountPlayer />} />
           <Route path="/newGame/:gameId" element={<NewGame />} />
           <Route path="/checkpoints/:gameId" element={<Checkpoints />} />
           <Route path="/participateGame" element={<ParticipateGame />} />

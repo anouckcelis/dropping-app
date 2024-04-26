@@ -24,13 +24,13 @@ const NavigatieHost = ({gameId}) => {
         </div>
         <span>Checkpoints</span>
       </Link>
-      <Link to="/qrscannerHost" className="nav-link">
+      <Link to={`/qrscannerHost/${gameId}`} className="nav-link">
         <div className="icon-container">
           <MdPhoneAndroid size={24} color="#257eca" />
         </div>
         <span>Scanner</span>
       </Link>
-      <Link to="/accountHost" className="nav-link">
+      <Link to={`/accountHost/${gameId}`} className="nav-link">
         <div className="icon-container">
           <MdPerson size={24} color="#257eca" /> 
         </div>

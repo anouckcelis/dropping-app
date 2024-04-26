@@ -8,6 +8,7 @@ import './checkpoints.css';
  * Component voor het beheren van checkpoints in een spel.
  * Maakt het toevoegen, weergeven en verwijderen van checkpoints mogelijk.
  */
+
 const Checkpoints = () => {
   // Parameters uit de URL halen, zoals gameId
   const { gameId } = useParams();

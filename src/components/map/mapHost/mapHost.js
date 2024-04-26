@@ -41,15 +41,17 @@ const MapHost = () => {
   }, [userLocation]);
 
   const fetchUserLocation = () => {
-    navigator.geolocation.getCurrentPosition(position => {
-      setUserLocation({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      });
-      updateUserLocation(getAuth().currentUser.uid, position.coords.latitude, position.coords.longitude, getAuth().currentUser.email);
-    }, error => {
-      console.error('Failed to fetch user location:', error);
-    });
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        });
+        updateUserLocation(getAuth().currentUser.uid, position.coords.latitude, position.coords.longitude, getAuth().currentUser.email);
+      }, error => {
+        console.error('Failed to fetch user location:', error);
+      }
+    );
   };
 
   const fetchNearbyUsers = async () => {
@@ -158,9 +160,10 @@ const MapHost = () => {
   const checkpointIcon = new Icon ({
     iconUrl : 'https://img.icons8.com/doodle/48/flag.png',
     iconSize : [35, 35],
-    iconAnchor : [22, 94],
-    popupAnchor : [-3, -76]
+    iconAnchor : [17, 35], // Aangepaste waarde voor iconAnchor
+    popupAnchor : [0, -35] // Aangepaste waarde voor popupAnchor
   });
+  
 
   return (
     <div className="map-wrapper">
