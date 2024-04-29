@@ -1,10 +1,11 @@
 import React from 'react';
+import './leaderboard.css';
 
 const Leaderboard = () => {
     return (
-      <div>
-        <h1>Leaderboard</h1>
-      </div>
+      <div className="leaderboard-container">
+      <h1>Ranglijst</h1>
+    </div>
     );
   }
 
