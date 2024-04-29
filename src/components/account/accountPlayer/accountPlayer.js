@@ -2,22 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
 import { updateDoc, doc } from 'firebase/firestore'; 
 import { getFirestore } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../../account/accountPlayer/accountPlayer.css';
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
 
 const AccountPlayer = () => {
   const auth = getAuth();
   const navigate = useNavigate();
+  const { gameId } = useParams();
   const [user, setUser] = useState(null);
-
-  // Initialiseer je Firestore database
   const db = getFirestore();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        // Als de gebruiker is uitgelogd, stuur ze naar de startpagina
         navigate('/');
       } else {
         setUser(user);
@@ -31,7 +29,7 @@ const AccountPlayer = () => {
     try {
       await signOut(auth);
       if (user) {
-        await updateUserStatus(user.uid, false); // Zet isLogged op false wanneer de gebruiker uitlogt
+        await updateUserStatus(user.uid, false);
       }
     } catch (error) {
       console.error('Error signing out:', error);
@@ -49,6 +47,16 @@ const AccountPlayer = () => {
     }
   };
 
+  const goToLeaderboard = () => {
+    // Navigeer naar de ranglijstpagina
+    navigate(`/leaderboard/${gameId}`);
+  };
+
+  const goToLogbook = () => {
+    // Navigeer naar het logboek
+    navigate(`/logbook/${gameId}`);
+  };
+
   return (
     <div className="account-container">
       <h1>Account</h1>
@@ -64,14 +72,13 @@ const AccountPlayer = () => {
       <br />
 
       <div>
-        <button className='button'>Ranglijst</button>  
-        <button className='button'>Logboek</button>   
-
+        <button className='button' onClick={goToLeaderboard}>Ranglijst</button>  
+        <button className='button' onClick={goToLogbook}>Logboek</button>   
       </div>
-      <NavigatiePlayer />
+      <NavigatiePlayer gameId={gameId} />
     </div>
   );
 };
 
-export default AccountPlayer;  
+export default AccountPlayer;
 

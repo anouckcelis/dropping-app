@@ -3,15 +3,14 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import '../../scanner/scannerPlayer/qrscannerPlayer.css';
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
 
-const QRScannerPlayer = () => {
+const QRScannerPlayer = ({ gameId }) => {
     const [scanResult, setScanResult] = useState(null);
     const scannerRef = useRef(null);
-     
 
     useEffect(() => {
         initializeScanner();
     }, []);
-    
+
     const initializeScanner = () => {
         if (!scannerRef.current) {
             const scanner = new Html5QrcodeScanner('reader', {
@@ -20,12 +19,11 @@ const QRScannerPlayer = () => {
                     height: 250,
                 },
                 fps: 5,
-            
-        });
+            });
 
-        scanner.render(success);
-        scannerRef.current = scanner;
-    }
+            scanner.render(success);
+            scannerRef.current = scanner;
+        }
 
         function success(result) {
             setScanResult(result);
@@ -40,7 +38,7 @@ const QRScannerPlayer = () => {
 
     // Reset scanResult zodat de scanner opnieuw klaarstaat
     const handleScanAgain = () => {
-        setScanResult(null); 
+        setScanResult(null);
     };
 
     return (
@@ -53,12 +51,13 @@ const QRScannerPlayer = () => {
                     <button className="button-opnieuw" onClick={handleScanAgain}>Opnieuw scannen</button>
                 </div>
             ) : null}
-            <NavigatiePlayer />
+            <NavigatiePlayer gameId={gameId} />
         </div>
     );
 };
 
 export default QRScannerPlayer;
+
 
 
 

@@ -41,6 +41,10 @@ const MapPlayer = () => {
     return () => clearInterval(intervalId);
   }, [userLocation]);
 
+  useEffect(() => {
+    fetchCheckpoints(); // Roep de fetchCheckpoints-functie aan bij het laden van de component
+  }, [gameId]); // Voeg gameId toe als afhankelijkheid van useEffect
+
   const fetchUserLocation = () => {
     navigator.geolocation.getCurrentPosition(position => {
       setUserLocation({
@@ -80,20 +84,21 @@ const MapPlayer = () => {
   };
 
   const fetchCheckpoints = async () => {
+    // Voeg een extra check toe om te voorkomen dat de functie wordt aangeroepen wanneer gameId leeg is
+    if (!gameId) return;
+
     const db = getFirestore();
     const checkpointsRef = collection(db, 'checkpoints');
     let checkpointsData = [];
 
     try {
-      if (gameId) {
-        const q = query(checkpointsRef, where("gameId", "==", gameId));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(doc => {
-          const checkpointData = doc.data();
-          checkpointsData.push(checkpointData);
-        });
-      }
-      
+      const q = query(checkpointsRef, where("gameId", "==", gameId));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(doc => {
+        const checkpointData = doc.data();
+        checkpointsData.push(checkpointData);
+      });
+
       setCheckpoints(checkpointsData);
     } catch (error) {
       console.error("Error fetching checkpoints:", error);
@@ -201,4 +206,5 @@ const MapPlayer = () => {
 };
 
 export default MapPlayer;
+
 

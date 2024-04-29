@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { MdHome, MdPlace, MdPhoneAndroid, MdPerson } from 'react-icons/md';
 import '../../navigatie/navigatiePlayer/navigatiePlayer.css';
 
-const NavigatiePlayer = ({gameId}) => {
+const NavigatiePlayer = ({ gameId }) => {
   return (
     <div className="navigation-bar">
       <Link to="/participateGame" className="nav-link">
@@ -24,7 +24,7 @@ const NavigatiePlayer = ({gameId}) => {
         </div>
         <span>QR-Scanner</span>
       </Link>
-      <Link to={`/accountHost/${gameId}`} className="nav-link">
+      <Link to={`/accountPlayer/${gameId}`} className="nav-link">
         <div className="icon-container">
           <MdPerson size={24} color="#257eca" /> 
         </div>

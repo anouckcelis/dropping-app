@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { MdHome, MdPlace, MdPhoneAndroid, MdPerson, MdFlag } from 'react-icons/md'; // Importeer het locatie-, telefoon- en persoonpictogram uit react-icons
 import '../../navigatie/navigatieHost/navigatieHost.css';
 
-const NavigatieHost = ({gameId}) => {
+const NavigatieHost = ({ gameId }) => {
   return (
     <div className="navigation-bar">
       <Link to={`/newGame/${gameId}`}  className="nav-link">
@@ -41,3 +41,4 @@ const NavigatieHost = ({gameId}) => {
 };
 
 export default NavigatieHost;
+

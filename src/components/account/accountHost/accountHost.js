@@ -2,22 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
 import { updateDoc, doc } from 'firebase/firestore'; 
 import { getFirestore } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom'; // Voeg useParams toe
 import '../../account/accountHost/accountHost.css';
 import NavigatieHost from '../../navigatie/navigatieHost/navigatieHost';
 
-const AccountHost = ({ gameId }) => {
+const AccountHost = () => {
   const auth = getAuth();
   const navigate = useNavigate();
+  const { gameId } = useParams();
   const [user, setUser] = useState(null);
-
-  // Initialiseer je Firestore database
   const db = getFirestore();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        // Als de gebruiker is uitgelogd, stuur ze naar de startpagina
         navigate('/');
       } else {
         setUser(user);
@@ -31,7 +29,7 @@ const AccountHost = ({ gameId }) => {
     try {
       await signOut(auth);
       if (user) {
-        await updateUserStatus(user.uid, false); // Zet isLogged op false wanneer de gebruiker uitlogt
+        await updateUserStatus(user.uid, false);
       }
     } catch (error) {
       console.error('Error signing out:', error);
@@ -49,6 +47,14 @@ const AccountHost = ({ gameId }) => {
     }
   };
 
+  const navigateToLeaderboard = () => {
+    navigate(`/leaderboard/${gameId}`); // Navigeer naar de ranglijstpagina met gameId
+  };
+
+  const navigateToLogbook = () => {
+    navigate(`/logbook/${gameId}`); // Navigeer naar het logboek met gameId
+  };
+
   return (
     <div className="account-container">
       <h1>Account</h1>
@@ -64,14 +70,14 @@ const AccountHost = ({ gameId }) => {
       <br />
 
       <div>
-        <button className='button'>Ranglijst</button>  
-        <button className='button'>Logboek</button>   
-
+        <button className='button' onClick={navigateToLeaderboard}>Ranglijst</button>  
+        <button className='button' onClick={navigateToLogbook}>Logboek</button>   
       </div>
       <NavigatieHost gameId={gameId} />
     </div>
   );
 };
 
-export default AccountHost;  
+export default AccountHost;
+ 
 

@@ -20,12 +20,11 @@ const QRScannerHost = ({ gameId }) => {
                     height: 250,
                 },
                 fps: 5,
-            
-        });
+            });
 
-        scanner.render(success);
-        scannerRef.current = scanner;
-    }
+            scanner.render(success);
+            scannerRef.current = scanner;
+        }
 
         function success(result) {
             setScanResult(result);
@@ -59,6 +58,7 @@ const QRScannerHost = ({ gameId }) => {
 };
 
 export default QRScannerHost;
+
 
 
 

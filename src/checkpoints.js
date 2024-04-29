@@ -3,7 +3,7 @@ import NavigatieHost from '../src/components/navigatie/navigatieHost/navigatieHo
 import { getFirestore, collection, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
 import './checkpoints.css';
 
-const Checkpoints = ({gameId}) => {
+const Checkpoints = ({ gameId }) => {
   const [checkpointName, setCheckpointName] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
@@ -26,7 +26,7 @@ const Checkpoints = ({gameId}) => {
       }
     };
     loadCheckpoints();
-  }, [db, gameId]);
+  }, [db, gameId]); // Voeg gameId toe aan de afhankelijkheden van useEffect
 
   const handleAddCheckpoint = async () => {
     if (checkpointName && latitude && longitude && gameId && gameId.trim() !== '') {
@@ -113,3 +113,4 @@ const Checkpoints = ({gameId}) => {
 };
 
 export default Checkpoints;
+
