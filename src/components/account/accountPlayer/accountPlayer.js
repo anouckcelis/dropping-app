@@ -72,7 +72,7 @@ const AccountPlayer = () => {
       <br />
 
       <div>
-        <button className='button' onClick={goToLeaderboard}>Ranglijst</button>  
+        <button className='button' onClick={goToLeaderboard}>Ranking</button>  
         <button className='button' onClick={goToLogbook}>Logboek</button>   
       </div>
       <NavigatiePlayer gameId={gameId} />

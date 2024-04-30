@@ -70,7 +70,7 @@ const AccountHost = () => {
       <br />
 
       <div>
-        <button className='button' onClick={navigateToLeaderboard}>Ranglijst</button>  
+        <button className='button' onClick={navigateToLeaderboard}>Ranking</button>  
         <button className='button' onClick={navigateToLogbook}>Logboek</button>   
       </div>
       <NavigatieHost gameId={gameId} />
