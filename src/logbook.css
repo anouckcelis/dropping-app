@@ -1,4 +1,4 @@
-.logbook-container {
+  .logbook-container {
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -12,7 +12,6 @@
     background-color: rgba(255, 255, 255, 0.8); /* Als je een deel van de achtergrondafbeelding wilt zien, kun je de achtergrondkleur met een lage dekking instellen */
     }
   
-    
     h1, h4 {
       color: 
       #257eca;
@@ -28,3 +27,32 @@
       margin-top: 20px;
       margin-bottom: 10px;
     }
+
+     .back-button-container {
+      position: fixed;
+      bottom: 30px;
+      right: 42px;
+      width: auto;
+      padding: 20px 0;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .back-button {
+      width: 70px; /* Maak de cirkel groter */
+      height: 70px; /* Maak de cirkel groter */
+      padding: 0;
+      border: none; /* Verwijder de rand */
+      border-radius: 50%;
+      font-size: 25px;
+      text-align: center;
+      background-color: #257eca;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+
+    
+   
