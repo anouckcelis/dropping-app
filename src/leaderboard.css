@@ -46,15 +46,13 @@
       will-change: transform;
       transition: all 0.3s ease-in;
     }
-    
-    .item__score {
-      flex: 1;
-      text-align: right;
-    }
-    
-    .item__name,
-    .item__score {
+  
+    .item__name {
       margin-left: 10px;
+    }
+
+    .item__position {
+      font-weight: bold;
     }
 
     .back-button-container {
