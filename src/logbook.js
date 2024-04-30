@@ -8,9 +8,6 @@ const Logbook = () => {
       <h1>Logboek</h1>
     </div>
       
-      
-
-    
   );
 };
 

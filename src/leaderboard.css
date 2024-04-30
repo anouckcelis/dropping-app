@@ -31,3 +31,57 @@
       margin-top: 20px;
       margin-bottom: 10px;
     }
+
+    .item-wrapper {
+      border: 2px solid #257eca;
+      width: 300px;
+      padding: 0;
+    }
+    
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      will-change: transform;
+      transition: all 0.3s ease-in;
+    }
+    
+    .item__score {
+      flex: 1;
+      text-align: right;
+    }
+    
+    .item__name,
+    .item__score {
+      margin-left: 10px;
+    }
+
+    .back-button-container {
+      position: fixed;
+      bottom: 30px;
+      right: 42px;
+      width: auto;
+      padding: 20px 0;
+      display: flex;
+      justify-content: flex-end;
+  }
+
+  .back-button {
+    width: 70px; /* Maak de cirkel groter */
+    height: 70px; /* Maak de cirkel groter */
+    padding: 0;
+    border: none; /* Verwijder de rand */
+    border-radius: 50%;
+    font-size: 25px;
+    text-align: center;
+    background-color: #257eca;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+
+    
+   
