@@ -164,8 +164,8 @@ const MapPlayer = () => {
   const checkpointIcon = new Icon ({
     iconUrl : 'https://img.icons8.com/doodle/48/flag.png',
     iconSize : [35, 35],
-    iconAnchor : [22, 94],
-    popupAnchor : [-3, -76]
+    iconAnchor : [17, 35], // Aangepaste waarde voor iconAnchor
+    popupAnchor : [0, -35] // Aangepaste waarde voor popupAnchor
   });
 
   return (
