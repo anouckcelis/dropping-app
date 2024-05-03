@@ -1,47 +1,58 @@
+// Importeer de NavLink en useNavigate hooks uit react-router-dom voor navigatie en links binnen de applicatie
 import { NavLink, useNavigate } from "react-router-dom";
+
+// Importeer de createUserWithEmailAndPassword en getAuth functies uit firebase/auth voor het registreren van gebruikers
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+
+// Importeer de useState hook uit React voor het beheren van component state
 import { useState } from "react";
 
+// Definieer de Register component
 const Register = () => {
+  // Gebruik useState om de waarden van email, password, error en errorMessage te beheren
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Gebruik de useNavigate hook om een functie te krijgen die kan worden gebruikt om naar andere routes te navigeren
   const navigate = useNavigate(); // Hook voor navigatie
 
-  // instantiate the auth service SDK
+  // Instantiateer de auth service SDK
   const auth = getAuth();
 
+  // Definieer de handleChange functie die wordt aangeroepen bij elke verandering in de input velden
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Update de state afhankelijk van het input veld dat is gewijzigd
     if (name === "email") setEmail(value);
     if (name === "password") setPassword(value);
   };
 
-  // Handle user sign up with email and password
+  // Definieer de handleSubmit functie die wordt aangeroepen bij het indienen van het formulier
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // create a new user with email and password
+      // Probeer een nieuwe gebruiker aan te maken met email en wachtwoord
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      // Pull out user's data from the userCredential property
+      // Haal de gebruikersgegevens uit de userCredential eigenschap
       const user = userCredential.user;
       // Navigeer terug naar de inlogpagina na succesvol registreren
       navigate('/login');
     } catch (err) {
-      // Handle errors here
+      // Behandel fouten hier
       const errorMessage = err.message;
       const errorCode = err.code;
 
       setError(true);
 
+      // Set de foutmelding afhankelijk van het soort fout
       switch (errorCode) {
         case "auth/weak-password":
           setErrorMessage("Wachtwoord is te zwak.");
@@ -66,6 +77,7 @@ const Register = () => {
     }
   };
 
+  // Render de component
   return (
     <>
       <div className={"mainContainer"}>
@@ -118,4 +130,5 @@ const Register = () => {
   );
 };
 
+// Exporteer de component zodat deze kan worden gebruikt in andere bestanden
 export default Register;

@@ -1,19 +1,30 @@
+// Importeer React en de useState en useEffect hooks voor het beheren van component state en effecten
 import React, { useState, useEffect } from 'react';
+
+// Importeer de NavigatieHost component voor navigatie binnen het spel
 import NavigatieHost from '../src/components/navigatie/navigatieHost/navigatieHost';
+
+// Importeer de nodige Firestore functies voor interactie met de database
 import { getFirestore, collection, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
+
+// Importeer de CSS-bestand voor stijlen
 import './checkpoints.css';
 
+// Definieer de Checkpoints component met een gameId prop
 const Checkpoints = ({ gameId }) => {
+  // Gebruik useState om de waarden van checkpointName, latitude, longitude, en checkpoints te beheren
   const [checkpointName, setCheckpointName] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [checkpoints, setCheckpoints] = useState([]);
-  const db = getFirestore();
+  const db = getFirestore(); // Initialiseer de Firestore database
 
+  // Gebruik useEffect om een effect te definiëren dat wordt uitgevoerd bij het mounten van de component en bij wijziging van gameId
   useEffect(() => {
     const loadCheckpoints = async () => {
       try {
-        if (gameId && gameId.trim() !== '') { // Controleren of gameId niet undefined, null of leeg is
+        // Controleer of gameId niet undefined, null of leeg is
+        if (gameId && gameId.trim()!== '') {
           const checkpointRef = doc(db, 'checkpoints', gameId);
           const checkpointDoc = await getDoc(checkpointRef);
           if (checkpointDoc.exists()) {
@@ -28,8 +39,9 @@ const Checkpoints = ({ gameId }) => {
     loadCheckpoints();
   }, [db, gameId]); // Voeg gameId toe aan de afhankelijkheden van useEffect
 
+  // Definieer de handleAddCheckpoint functie die wordt aangeroepen om een nieuw checkpoint toe te voegen
   const handleAddCheckpoint = async () => {
-    if (checkpointName && latitude && longitude && gameId && gameId.trim() !== '') {
+    if (checkpointName && latitude && longitude && gameId && gameId.trim()!== '') {
       const newCheckpoint = {
         name: checkpointName,
         lat: parseFloat(latitude),
@@ -37,24 +49,29 @@ const Checkpoints = ({ gameId }) => {
       };
 
       try {
-        await addDoc(collection(db, 'checkpoints'), { gameId, ...newCheckpoint });
+        // Voeg het nieuwe checkpoint toe aan de 'checkpoints' collectie
+        await addDoc(collection(db, 'checkpoints'), { gameId,...newCheckpoint });
+        // Update de lokale checkpoints state
         setCheckpoints([...checkpoints, newCheckpoint]);
       } catch (error) {
         console.error('Fout bij het toevoegen van het checkpoint:', error);
       }
 
+      // Reset de input velden
       setCheckpointName('');
       setLatitude('');
       setLongitude('');
     }
   };
- 
+
+  // Definieer de handleDeleteCheckpoint functie die wordt aangeroepen om een checkpoint te verwijderen
   const handleDeleteCheckpoint = async (index) => {
     const updatedCheckpoints = [...checkpoints];
     updatedCheckpoints.splice(index, 1);
     setCheckpoints(updatedCheckpoints);
 
     try {
+      // Update de checkpoints in de database
       await updateDoc(doc(db, 'checkpoints', gameId), {
         gameId,
         checkpoints: updatedCheckpoints
@@ -64,6 +81,7 @@ const Checkpoints = ({ gameId }) => {
     }
   };
 
+  // Render de component
   return (
     <div className="checkpoint-container">
       <h1>Checkpoints</h1>
@@ -112,5 +130,7 @@ const Checkpoints = ({ gameId }) => {
   );
 };
 
+// Exporteer de component zodat deze kan worden gebruikt in andere bestanden
 export default Checkpoints;
+
 

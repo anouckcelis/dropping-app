@@ -1,5 +1,10 @@
+// Importeer React en de useState hook voor het beheren van component state
 import React, { useState } from 'react';
+
+// Importeer de nodige componenten en hooks uit react-router-dom voor routing
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom';
+
+// Importeer de componenten die worden gebruikt in de applicatie
 import Start from './start.js';
 import Login from './login.js';
 import Home from './home.js';
@@ -15,8 +20,8 @@ import Checkpoints from './checkpoints.js';
 import ParticipateGame from './participateGame.js';
 import Leaderboard from './leaderboard.js'; // Importeer de ranglijstpagina
 import Logbook from './logbook.js'; // Importeer de logboekpagina
-import './App.css';
-import firebase from './firebase.js';
+import './App.css'; // Importeer de CSS-bestand voor stijlen
+import firebase from './firebase.js'; // Importeer Firebase voor authenticatie en database interactie
 
 // Definieer een nieuwe component voor het extraheren van gameId uit de URL
 const ExtractedGameId = () => {
@@ -25,6 +30,7 @@ const ExtractedGameId = () => {
 };
 
 function App() {
+  // Gebruik useState om de logged-in status en e-mail van de gebruiker te beheren
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
 
@@ -32,6 +38,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
+          {/* Definieer de routes voor de applicatie */}
           <Route path="/" element={<Start/>} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} />} />
@@ -47,14 +54,13 @@ function App() {
           <Route path="/participateGame" element={<ParticipateGame />} />
           <Route path="/leaderboard/:gameId" element={<Leaderboard />} /> {/* Voeg de ranglijstpagina toe */}
           <Route path="/logbook/:gameId" element={<><ExtractedGameId /><Logbook /></>} />
-
-
         </Routes>
       </BrowserRouter>
     </div>
   );
 }
 
+// Exporteer de component zodat deze kan worden gebruikt in andere bestanden
 export default App;
 
 
