@@ -7,9 +7,11 @@ import { getFirestore, collection, doc, setDoc, getDocs, where, query } from 'fi
 import '../../map/mapPlayer/mapPlayer.css';
 import { Icon } from 'leaflet';
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const MapPlayer = () => {
+  const navigate = useNavigate();
+  
   // State voor de locatie van de gebruiker, nabijgelegen gebruikers, e-mail van de huidige gebruiker en checkpoints
   const [userLocation, setUserLocation] = useState(null);
   const [nearbyUsers, setNearbyUsers] = useState([]);
@@ -179,6 +181,13 @@ const MapPlayer = () => {
     popupAnchor : [0, -35]
   });
 
+  // Functie om de gebruiker door te sturen naar de scannerpagina met het checkpointId
+  const handleScanCheckpoint = (checkpointId) => {
+    console.log(`Checkpoint ${checkpointId} gescand!`);
+    // Hier navigeer je de gebruiker naar de scannerpagina met het checkpointId
+    navigate(`/scan/${checkpointId}`);
+  };
+
   return (
     <div className="map-wrapper">
       <div className="map-container">
@@ -203,7 +212,7 @@ const MapPlayer = () => {
             </Marker>
           ))}
           {checkpoints.map((checkpoint, index) => (
-            <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={checkpointIcon}>
+            <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={checkpointIcon} onClick={() => handleScanCheckpoint(checkpoint.id)}>
               <Popup>
                 <p>{checkpoint.name}</p>
               </Popup>
@@ -217,5 +226,3 @@ const MapPlayer = () => {
 };
 
 export default MapPlayer;
-
-
