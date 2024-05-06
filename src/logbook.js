@@ -36,7 +36,7 @@ const Logbook = ({ gameId }) => {
 
         // Set de spelers in de state
         setPlayers(filteredPlayers);
-        
+
         // Zet loading naar false
         setLoading(false);
       } catch (error) {
@@ -46,7 +46,7 @@ const Logbook = ({ gameId }) => {
         setLoading(false);
       }
     };
-  
+
     // Roep de fetchPlayers functie aan
     fetchPlayers();
   }, [gameId]); // Het effect wordt uitgevoerd bij het mounten van de component en bij wijziging van gameId

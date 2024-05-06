@@ -52,7 +52,7 @@ function App() {
           <Route path="/newGame/:gameId" element={<NewGame />} />
           <Route path="/checkpoints/:gameId" element={<Checkpoints />} />
           <Route path="/participateGame" element={<ParticipateGame />} />
-          <Route path="/leaderboard/:gameId" element={<Leaderboard />} /> {/* Voeg de ranglijstpagina toe */}
+          <Route path="/leaderboard/:gameId" element={<Leaderboard />} />
           <Route path="/logbook/:gameId" element={<><ExtractedGameId /><Logbook /></>} />
         </Routes>
       </BrowserRouter>
