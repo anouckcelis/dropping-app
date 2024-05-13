@@ -33,7 +33,8 @@ const Checkpoints = () => {
       const newCheckpoint = {
         name: checkpointName,
         lat: parseFloat(latitude),
-        lng: parseFloat(longitude)
+        lng: parseFloat(longitude),
+        scanned: false // Hier wordt het nieuwe veld 'scanned' toegevoegd met de waarde false
       };
 
       try {

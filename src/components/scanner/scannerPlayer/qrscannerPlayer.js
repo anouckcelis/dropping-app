@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, updateDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import { getFirestore, updateDoc, getDocs, collection, query, where, doc } from 'firebase/firestore';
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
 
 const QRScannerPlayer = ({ gameId }) => {
@@ -30,9 +30,9 @@ const QRScannerPlayer = ({ gameId }) => {
         }
     };
 
-    const handleScanSuccess = (result) => {
+    const handleScanSuccess = async (result) => {
         setScanResult(result);
-        saveScannedCheckpoint(result);
+        await saveScannedCheckpoint(result); // Wacht op het opslaan van het gescande checkpoint
     };
 
     const saveScannedCheckpoint = async (checkpointId) => {
@@ -69,6 +69,10 @@ const QRScannerPlayer = ({ gameId }) => {
             } else {
                 console.error('Geen overeenkomende speler gevonden voor ingelogde gebruiker en gameId:', userEmail, gameId);
             }
+
+            // Markeer het gescande checkpoint als gecontroleerd
+            const checkpointDocRef = doc(db, 'checkpoints', checkpointId);
+            await updateDoc(checkpointDocRef, { checked: true });
         } catch (error) {
             console.error('Fout bij het bijwerken van gescande checkpoints:', error);
         }

@@ -18,6 +18,7 @@ const MapPlayer = () => {
   const [nearbyUsers, setNearbyUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [checkpoints, setCheckpoints] = useState([]);
+  const [scannedCheckpoints, setScannedCheckpoints] = useState([]); // Nieuwe staat voor gescande checkpoints toegevoegd
   const db = getFirestore();
 
   useEffect(() => {
@@ -28,6 +29,7 @@ const MapPlayer = () => {
         setCurrentUserEmail(user.email);
         markUserAsLogged(user.uid);
         fetchCheckpoints();
+        fetchScannedCheckpoints(); // Haal gescande checkpoints op bij het laden van de component
       }
     });
 
@@ -107,6 +109,30 @@ const MapPlayer = () => {
     }
   };
 
+  const fetchScannedCheckpoints = async () => {
+    if (!gameId) return;
+
+    const db = getFirestore();
+    const scannedCheckpointsRef = collection(db, 'checkpoints'); // Aanpassing nodig afhankelijk van uw Firestore-structuur
+
+    try {
+      // Haal gescande checkpoints op uit de database
+      const querySnapshot = await getDocs(scannedCheckpointsRef);
+      const scannedCheckpointsData = [];
+
+      querySnapshot.forEach(doc => {
+        const checkpointData = doc.data();
+        if (checkpointData.checked) {
+          scannedCheckpointsData.push(doc.id);
+        }
+      });
+
+      setScannedCheckpoints(scannedCheckpointsData);
+    } catch (error) {
+      console.error("Error fetching scanned checkpoints:", error);
+    }
+  };
+
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
     const dLat = toRadians(lat2 - lat1);
@@ -170,6 +196,15 @@ const MapPlayer = () => {
     popupAnchor : [0, -35]
   });
 
+  const checkedIconUrl = 'https://example.com/checked.png'; // URL naar het vinkje-pictogram
+  const checkedIcon = new L.Icon({
+    iconUrl: checkedIconUrl,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+
   const handleScanCheckpoint = (checkpointName) => {
     console.log(`Checkpoint ${checkpointName} gaat gescand worden!`);
     navigate(`/qrscannerPlayer/${gameId}`);
@@ -199,7 +234,7 @@ const MapPlayer = () => {
             </Marker>
           ))}
           {checkpoints.map((checkpoint, index) => (
-            <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={checkpointIcon}>
+            <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={scannedCheckpoints.includes(checkpoint.id) ? checkedIcon : checkpointIcon}>
               <Popup className='popUp-checkpoint'>
                 <p>{checkpoint.name}</p>
                 <button className='button-checkpoint-map' onClick={() => handleScanCheckpoint(checkpoint.name)}>Scan QR</button>
