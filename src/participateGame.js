@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Importeer de nodige Firestore functies voor interactie met de database
-import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc } from 'firebase/firestore';
 
 // Importeer de NavigatiePlayer component voor navigatie binnen het spel
 import NavigatiePlayer from '../src/components/navigatie/navigatiePlayer/navigatiePlayer';
@@ -45,7 +45,7 @@ const ParticipateGame = () => {
       if (user) {
         // Voeg de gebruiker toe aan de players collectie
         const email = user.email;
-        await addDoc(collection(db, 'players'), { email, gameId, role: 'player' });
+        await addDoc(collection(db, 'players'), { email, gameId, role: 'player', aantalGescandeCheckpoints: 0 });
         // Update de component state
         setIsGameStarted(true);
         setPlayerEmail(email);

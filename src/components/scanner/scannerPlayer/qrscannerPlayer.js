@@ -30,11 +30,11 @@ const QRScannerPlayer = ({ gameId }) => {
         }
     };
 
-    const handleScanSuccess = async (result) => {
-        setScanResult(result);
-        await saveScannedCheckpoint(result); // Wacht op het opslaan van het gescande checkpoint
+    const handleScanSuccess = async (checkpointId) => {
+        setScanResult(checkpointId);
+        await saveScannedCheckpoint(checkpointId); // Wacht op het opslaan van het gescande checkpoint
     };
-
+    
     const saveScannedCheckpoint = async (checkpointId) => {
         try {
             const user = auth.currentUser;
@@ -50,7 +50,7 @@ const QRScannerPlayer = ({ gameId }) => {
                 console.error('gameId is niet gedefinieerd.');
                 return;
             }
-
+    
             const emailQuery = query(collection(db, 'players'), where('email', '==', userEmail));
             const gameIdQuery = query(collection(db, 'players'), where('gameId', '==', gameId));
             const [emailQuerySnapshot, gameIdQuerySnapshot] = await Promise.all([getDocs(emailQuery), getDocs(gameIdQuery)]);
@@ -58,7 +58,7 @@ const QRScannerPlayer = ({ gameId }) => {
             const matchingPlayers = emailQuerySnapshot.docs.filter(doc =>
                 gameIdQuerySnapshot.docs.some(snapshotDoc => snapshotDoc.id === doc.id)
             );
-
+    
             if (matchingPlayers.length > 0) {
                 for (const doc of matchingPlayers) {
                     const playerRef = doc.ref;
@@ -69,14 +69,15 @@ const QRScannerPlayer = ({ gameId }) => {
             } else {
                 console.error('Geen overeenkomende speler gevonden voor ingelogde gebruiker en gameId:', userEmail, gameId);
             }
-
-            // Markeer het gescande checkpoint als gecontroleerd
+    
+            // Markeer het gescande checkpoint als gescand
             const checkpointDocRef = doc(db, 'checkpoints', checkpointId);
-            await updateDoc(checkpointDocRef, { checked: true });
+            await updateDoc(checkpointDocRef, { scanned: true });
         } catch (error) {
             console.error('Fout bij het bijwerken van gescande checkpoints:', error);
         }
     };
+    
 
     const handleScanAgain = () => {
         setScanResult(null);

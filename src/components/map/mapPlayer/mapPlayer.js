@@ -116,22 +116,22 @@ const MapPlayer = () => {
     const scannedCheckpointsRef = collection(db, 'checkpoints'); // Aanpassing nodig afhankelijk van uw Firestore-structuur
 
     try {
-      // Haal gescande checkpoints op uit de database
-      const querySnapshot = await getDocs(scannedCheckpointsRef);
-      const scannedCheckpointsData = [];
+        // Haal gescande checkpoints op uit de database
+        const querySnapshot = await getDocs(scannedCheckpointsRef);
+        const scannedCheckpointsData = [];
 
-      querySnapshot.forEach(doc => {
-        const checkpointData = doc.data();
-        if (checkpointData.checked) {
-          scannedCheckpointsData.push(doc.id);
-        }
-      });
+        querySnapshot.forEach(doc => {
+            const checkpointData = doc.data();
+            if (checkpointData.scanned) { // Check of het checkpoint is gescand
+                scannedCheckpointsData.push(checkpointData.id); // Push alleen de ID van het gescande checkpoint
+            }
+        });
 
-      setScannedCheckpoints(scannedCheckpointsData);
+        setScannedCheckpoints(scannedCheckpointsData);
     } catch (error) {
-      console.error("Error fetching scanned checkpoints:", error);
+        console.error("Error fetching scanned checkpoints:", error);
     }
-  };
+};
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
