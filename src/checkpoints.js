@@ -37,8 +37,13 @@ const Checkpoints = () => {
       };
 
       try {
-        const docRef = await addDoc(collection(db, 'checkpoints'), { gameId, ...newCheckpoint });
-        setCheckpoints([...checkpoints, { id: docRef.id, ...newCheckpoint }]);
+        const checkpointRef = collection(db, 'checkpoints');
+        const docRef = await addDoc(checkpointRef, { gameId, ...newCheckpoint });
+        const checkpointWithId = { id: docRef.id, ...newCheckpoint };
+        setCheckpoints([...checkpoints, checkpointWithId]);
+        
+        // Log de toegevoegde checkpoint met id in de console
+        console.log('Toegevoegde checkpoint:', checkpointWithId);
       } catch (error) {
         console.error('Fout bij het toevoegen van het checkpoint:', error);
       }

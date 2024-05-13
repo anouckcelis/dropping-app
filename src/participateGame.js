@@ -14,7 +14,7 @@ import NavigatiePlayer from '../src/components/navigatie/navigatiePlayer/navigat
 import './participateGame.css';
 
 // Importeer de auth en firestore instanties uit het firebase configuratiebestand
-import { auth, firestore } from './firebase';
+import { auth } from './firebase';
 
 // Definieer de ParticipateGame component
 const ParticipateGame = () => {

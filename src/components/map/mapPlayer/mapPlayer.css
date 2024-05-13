@@ -8,4 +8,21 @@
     width: 100%;
   }
 
+  .button-checkpoint-map {
+    border: none;
+    background: #257eca;
+    color: white;
+    font-size: 20px;
+    padding: 5px;
+    margin: 1px;
+    width: 100px;
+}
+
+.popUp-checkpoint {
+  align-items: center;
+  align-content: center;
+}
+
+
+
   
