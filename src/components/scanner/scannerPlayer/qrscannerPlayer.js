@@ -9,7 +9,6 @@ const QRScannerPlayer = ({ gameId }) => {
     const scannerRef = useRef(null);
     const db = getFirestore();
     const auth = getAuth();
-    const currentUserEmail = auth.currentUser ? auth.currentUser.email : '';
 
     useEffect(() => {
         initializeScanner();

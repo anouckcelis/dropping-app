@@ -45,7 +45,7 @@ const ParticipateGame = () => {
       if (user) {
         // Voeg de gebruiker toe aan de players collectie
         const email = user.email;
-        await addDoc(collection(db, 'players'), { email, gameId, role: 'player', aantalGescandeCheckpoints: 0 });
+        await addDoc(collection(db, 'players'), { email, gameId, role: 'player', aantalGescandeCheckpoints: 0, aantalKerenGecatcht: 0 });
         // Update de component state
         setIsGameStarted(true);
         setPlayerEmail(email);
