@@ -154,7 +154,7 @@ const MapPlayer = () => {
 
     setDoc(userDocRef, { isLogged: true }, { merge: true })
     .then(() => {
-        console.log("User marked as logged in Firestore!");
+        console.log("User  as logged in Firestore!");
       })
     .catch((error) => {
         console.error("Error marking user as logged in Firestore:", error);
@@ -195,8 +195,8 @@ const MapPlayer = () => {
     popupAnchor : [0, -35]
   });
 
-  const checkedIconUrl = 'https://example.com/checked.png'; 
-  const checkedIcon = new L.Icon({
+  const checkedIconUrl = 'https://icons8.com/icon/D9RtvkuOe31p/instagram-check-mark.png'; 
+  const checkedIcon = new Icon({
     iconUrl: checkedIconUrl,
     iconSize: [25, 41],
     iconAnchor: [12, 41],
@@ -237,7 +237,6 @@ const MapPlayer = () => {
       }
     }
   };
-  
 
   return (
     <div className="map-wrapper">
