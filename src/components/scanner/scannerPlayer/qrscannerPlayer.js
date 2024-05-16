@@ -51,12 +51,13 @@ const QRScannerPlayer = ({ gameId }) => {
             }
     
             const emailQuery = query(collection(db, 'players'), where('email', '==', userEmail));
-            const gameIdQuery = query(collection(db, 'players'), where('gameId', '==', gameId));
-            const [emailQuerySnapshot, gameIdQuerySnapshot] = await Promise.all([getDocs(emailQuery), getDocs(gameIdQuery)]);
+            const emailQuerySnapshot = await getDocs(emailQuery);
             
-            const matchingPlayers = emailQuerySnapshot.docs.filter(doc =>
-                gameIdQuerySnapshot.docs.some(snapshotDoc => snapshotDoc.id === doc.id)
-            );
+            const matchingPlayers = emailQuerySnapshot.docs.filter(doc => {
+                const playerData = doc.data();
+                return playerData.gameId === gameId;
+            });
+            
     
             if (matchingPlayers.length > 0) {
                 for (const doc of matchingPlayers) {

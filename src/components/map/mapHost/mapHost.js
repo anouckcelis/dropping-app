@@ -8,10 +8,10 @@ import L from 'leaflet';
 
 // Importeer Firebase authenticatie en Firestore database
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, getDocs, where, query } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, getDocs, where, query, getDoc } from 'firebase/firestore';
 
 // Importeer CSS voor de map en navigatie host
-import '../../map/mapPlayer/mapPlayer.css';
+import '../../map/mapHost/mapHost.css';
 import { Icon } from 'leaflet';
 import NavigatieHost from '../../navigatie/navigatieHost/navigatieHost';
 
@@ -95,7 +95,7 @@ const MapHost = () => {
         const userData = doc.data();
         const distance = calculateDistance(userLocation.lat, userLocation.lng, userData.lat, userData.lng);
 
-        if (distance <= maxDistance && userData.isLogged && userData.email!== currentUserEmail) {
+        if (distance <= maxDistance && userData.isLogged && userData.email !== currentUserEmail) {
           nearbyUsersData.push(userData);
         }
       });
@@ -179,6 +179,46 @@ const MapHost = () => {
       });
   };
 
+  const handleCatchButtonClick = async (email, user) => {
+    if (!user) {
+      console.error('Gebruikersgegevens zijn niet gedefinieerd.');
+      return;
+    }
+  
+    console.log("E-mail van de speler:", email); // Controleren of de ingelogde gebruiker de verwachte is
+  
+    const distance = calculateDistance(userLocation.lat, userLocation.lng, user.lat, user.lng);
+    const maxDistance = 10; // 10 meter
+  
+    if (distance <= maxDistance) {
+      try {
+        const db = getFirestore();
+        const usersRef = collection(db, 'players');
+        const querySnapshot = await getDocs(query(usersRef, where("email", "==", email)));
+  
+        if (!querySnapshot.empty) {
+          const userDocSnapshot = querySnapshot.docs[0];
+          const userData = userDocSnapshot.data();
+          const aantalKeerGecatcht = userData.aantalKeerGecatcht || 0;
+  
+          console.log("Gebruikersgegevens gevonden:", userData);
+
+          await setDoc(userDocSnapshot.ref, { aantalKeerGecatcht: aantalKeerGecatcht + 1 }, { merge: true });
+          
+          console.log(`Aantal keer gecatcht voor ${email} is bijgewerkt.`);
+        } else {
+          console.error(`Speler met e-mail ${email} bestaat niet.`);
+        }
+      } catch (error) {
+        console.error('Error updating caught count:', error);
+      }
+    } else {
+      console.error('Speler is buiten bereik om te vangen of de gameId komt niet overeen.');
+    }
+  };
+  
+  
+  
   // Definieer de iconen voor de markers op de kaart
   const icon = L.icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -215,8 +255,9 @@ const MapHost = () => {
           )}
           {nearbyUsers.map((user, index) => (
             <Marker key={index} position={[user.lat, user.lng]} icon={icon}>
-              <Popup>
+              <Popup className='popUp-catch'>
                 <p>{user.email}</p>
+                <button className='button-catch-map' onClick={() => handleCatchButtonClick(user.email, user)}>Catch</button>
               </Popup>
             </Marker>
           ))}

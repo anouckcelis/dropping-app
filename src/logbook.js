@@ -70,9 +70,9 @@ const Logbook = ({ gameId }) => {
           {players.map((player, index) => (
             <li key={index} className="item">
               <span className="item__position">{player.email}</span>
-              <span>Totaal aantal punten gescand: {player.points || 0}</span>
-              <span>Aantal keer gecatcht: {player.catches || 0}</span>
-              <span>Tijd: {player.time || 'N/A'}</span>
+              <span>Totaal aantal punten gescand: </span>
+              <span>Aantal keer gecatcht: </span>
+              <span>Tijd: </span>
             </li>
           ))}
         </ul>
