@@ -18,7 +18,7 @@ const MapPlayer = () => {
   const [nearbyUsers, setNearbyUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [checkpoints, setCheckpoints] = useState([]);
-  const [scannedCheckpoints, setScannedCheckpoints] = useState([]); // Nieuwe staat voor gescande checkpoints toegevoegd
+  const [scannedCheckpoints, setScannedCheckpoints] = useState([]); 
   const db = getFirestore();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const MapPlayer = () => {
         setCurrentUserEmail(user.email);
         markUserAsLogged(user.uid);
         fetchCheckpoints();
-        fetchScannedCheckpoints(); // Haal gescande checkpoints op bij het laden van de component
+        fetchScannedCheckpoints(); 
       }
     });
 
@@ -113,25 +113,24 @@ const MapPlayer = () => {
     if (!gameId) return;
 
     const db = getFirestore();
-    const scannedCheckpointsRef = collection(db, 'checkpoints'); // Aanpassing nodig afhankelijk van uw Firestore-structuur
+    const scannedCheckpointsRef = collection(db, 'checkpoints');
 
     try {
-        // Haal gescande checkpoints op uit de database
-        const querySnapshot = await getDocs(scannedCheckpointsRef);
-        const scannedCheckpointsData = [];
+      const querySnapshot = await getDocs(scannedCheckpointsRef);
+      const scannedCheckpointsData = [];
 
-        querySnapshot.forEach(doc => {
-            const checkpointData = doc.data();
-            if (checkpointData.scanned) { // Check of het checkpoint is gescand
-                scannedCheckpointsData.push(checkpointData.id); // Push alleen de ID van het gescande checkpoint
-            }
-        });
+      querySnapshot.forEach(doc => {
+        const checkpointData = doc.data();
+        if (checkpointData.scanned) {
+          scannedCheckpointsData.push(checkpointData.id);
+        }
+      });
 
-        setScannedCheckpoints(scannedCheckpointsData);
+      setScannedCheckpoints(scannedCheckpointsData);
     } catch (error) {
-        console.error("Error fetching scanned checkpoints:", error);
+      console.error("Error fetching scanned checkpoints:", error);
     }
-};
+  };
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
@@ -196,7 +195,7 @@ const MapPlayer = () => {
     popupAnchor : [0, -35]
   });
 
-  const checkedIconUrl = 'https://example.com/checked.png'; // URL naar het vinkje-pictogram
+  const checkedIconUrl = 'https://example.com/checked.png'; 
   const checkedIcon = new L.Icon({
     iconUrl: checkedIconUrl,
     iconSize: [25, 41],
@@ -205,10 +204,40 @@ const MapPlayer = () => {
     shadowSize: [41, 41]
   });
 
-  const handleScanCheckpoint = (checkpointName) => {
-    console.log(`Checkpoint ${checkpointName} gaat gescand worden!`);
+  const handleScanCheckpoint = async (checkpointName, email, user) => {
+    console.log(`Checkpoint ${checkpointName} wordt gescand!`);
     navigate(`/qrscannerPlayer/${gameId}`);
+  
+    // Bereken de afstand tussen de ingelogde gebruiker en de speler die gevangen wordt
+    const distance = calculateDistance(userLocation.lat, userLocation.lng, user.lat, user.lng);
+    const maxDistance = 10; // Maximale afstand om te vangen is 10 meter
+  
+    if (distance <= maxDistance) {
+      try {
+        const db = getFirestore();
+        const usersRef = collection(db, 'players');
+  
+        const querySnapshot = await getDocs(query(usersRef, where("email", "==", email)));
+  
+        if (!querySnapshot.empty) {
+          const userDocSnapshot = querySnapshot.docs[0];
+          const userData = userDocSnapshot.data();
+          const aantalGescandeCheckpoints = userData.aantalGescandeCheckpoints || 0;
+  
+          console.log("Gebruikersgegevens gevonden:", userData);
+  
+          await setDoc(userDocSnapshot.ref, { aantalGescandeCheckpoints: aantalGescandeCheckpoints + 1 }, { merge: true });
+  
+          console.log(`Aantal gescande checkpoints voor ${email} is bijgewerkt.`);
+        } else {
+          console.error(`Gebruiker met e-mail ${email} bestaat niet.`);
+        }
+      } catch (error) {
+        console.error('Fout bij het bijwerken van het aantal gescande checkpoints:', error);
+      }
+    }
   };
+  
 
   return (
     <div className="map-wrapper">
@@ -237,10 +266,11 @@ const MapPlayer = () => {
             <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={scannedCheckpoints.includes(checkpoint.id) ? checkedIcon : checkpointIcon}>
               <Popup className='popUp-checkpoint'>
                 <p>{checkpoint.name}</p>
-                <button className='button-checkpoint-map' onClick={() => handleScanCheckpoint(checkpoint.name)}>Scan QR</button>
+                <button className='button-checkpoint-map' onClick={() => handleScanCheckpoint(checkpoint.name, currentUserEmail, checkpoint)}>Scan QR</button>
               </Popup>
             </Marker>
           ))}
+
         </MapContainer>
       </div>
       <NavigatiePlayer gameId={gameId}/>

@@ -180,23 +180,30 @@ const MapHost = () => {
   };
 
   const handleCatchButtonClick = async (email, user) => {
+    // Controleer of de gebruikersgegevens zijn gedefinieerd
     if (!user) {
       console.error('Gebruikersgegevens zijn niet gedefinieerd.');
       return;
     }
   
-    console.log("E-mail van de speler:", email); // Controleren of de ingelogde gebruiker de verwachte is
+    // Log de e-mail van de speler om te controleren of de ingelogde gebruiker de verwachte is
+    console.log("E-mail van de speler:", email); 
   
+    // Bereken de afstand tussen de ingelogde gebruiker en de speler die gevangen wordt
     const distance = calculateDistance(userLocation.lat, userLocation.lng, user.lat, user.lng);
-    const maxDistance = 10; // 10 meter
+    const maxDistance = 10; // Maximale afstand om te vangen is 10 meter
   
+    // Controleer of de speler binnen het vangbereik is
     if (distance <= maxDistance) {
       try {
         const db = getFirestore();
         const usersRef = collection(db, 'players');
+        
+        // Zoek de speler in de database op basis van het e-mailadres
         const querySnapshot = await getDocs(query(usersRef, where("email", "==", email)));
   
         if (!querySnapshot.empty) {
+          // Als de speler is gevonden, werk het aantal keer dat hij is gevangen bij
           const userDocSnapshot = querySnapshot.docs[0];
           const userData = userDocSnapshot.data();
           const aantalKeerGecatcht = userData.aantalKeerGecatcht || 0;
@@ -210,12 +217,12 @@ const MapHost = () => {
           console.error(`Speler met e-mail ${email} bestaat niet.`);
         }
       } catch (error) {
-        console.error('Error updating caught count:', error);
+        console.error('Fout bij het bijwerken van het aantal keren dat de speler is gevangen:', error);
       }
     } else {
       console.error('Speler is buiten bereik om te vangen of de gameId komt niet overeen.');
     }
-  };
+};
   
   
   
