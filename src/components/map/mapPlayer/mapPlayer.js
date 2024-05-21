@@ -9,9 +9,6 @@ import { Icon } from 'leaflet';
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
 import { useParams, useNavigate } from 'react-router-dom';
 
-// Importeer de afbeelding voor het gecontroleerde pictogram
-import checkedIconUrl from './checkedIcon.png';
-
 const MapPlayer = () => {
   const navigate = useNavigate();
   
@@ -194,6 +191,16 @@ const MapPlayer = () => {
       });
   };
 
+  
+  const icon = L.icon({
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+
     // Definieer het pictogram voor niet-gescande checkpoints
     const checkpointIcon = new Icon ({
       iconUrl : 'https://img.icons8.com/doodle/48/flag.png',
@@ -204,7 +211,7 @@ const MapPlayer = () => {
   
     // Definieer het pictogram voor gescande checkpoints
     const checkedIcon = new Icon({
-      iconUrl: checkedIconUrl,
+      iconUrl: "",
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],
@@ -246,43 +253,42 @@ const MapPlayer = () => {
       }
     };
 
-    return (
-      <div className="map-wrapper">
-        <div className="map-container">
-          <MapContainer key={userLocation? `${userLocation.lat}-${userLocation.lng}` : 'default'} center={userLocation? [userLocation.lat, userLocation.lng] : [51.2195, 4.4024]} zoom={12} style={{ height: "100%", width: "100%" }}>
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {userLocation && (
-              <Marker position={[userLocation.lat, userLocation.lng]} icon={icon}>
-                <Popup>
-                  <p><strong>Mijn locatie</strong></p>
-                  <p>{currentUserEmail}</p>
-                </Popup>
-              </Marker>
-            )}
-            {nearbyUsers.map((user, index) => (
-              <Marker key={index} position={[user.lat, user.lng]} icon={icon}>
-                <Popup>
-                  <p>{user.email}</p>
-                </Popup>
-              </Marker>
-            ))}
-            {checkpoints.map((checkpoint, index) => (
-              <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={scannedCheckpoints.includes(checkpoint.name) ? checkedIcon : checkpointIcon}>
-                <Popup className='popUp-checkpoint'>
-                  <p>{checkpoint.name}</p>
-                  <button className='button-checkpoint-map' onClick={() => handleScanCheckpoint(checkpoint.name, currentUserEmail, checkpoint)}>Scan QR</button>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
-        <NavigatiePlayer gameId={gameId}/>
+      return (
+    <div className="map-wrapper">
+      <div className="map-container">
+        <MapContainer key={userLocation? `${userLocation.lat}-${userLocation.lng}` : 'default'} center={userLocation? [userLocation.lat, userLocation.lng] : [51.2195, 4.4024]} zoom={12} style={{ height: "100%", width: "100%" }}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+          {userLocation && (
+            <Marker position={[userLocation.lat, userLocation.lng]} icon={icon}>
+              <Popup>
+                <p><strong>Mijn locatie</strong></p>
+                <p>{currentUserEmail}</p>
+              </Popup>
+            </Marker>
+          )}
+          {nearbyUsers.map((user, index) => (
+            <Marker key={index} position={[user.lat, user.lng]} icon={icon}>
+              <Popup>
+                <p>{user.email}</p>
+              </Popup>
+            </Marker>
+          ))}
+          {checkpoints.map((checkpoint, index) => (
+            <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={checkpointIcon}>
+              <Popup className='popUp-checkpoint'>
+                <p>{checkpoint.name}</p>
+                <button className='button-checkpoint-map' onClick={() => handleScanCheckpoint(checkpoint.name, currentUserEmail, checkpoint)}>Scan QR</button>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
       </div>
-    );
-  };
-  
-  export default MapPlayer;
-  
+      <NavigatiePlayer gameId={gameId}/>
+    </div>
+  );
+};
+
+export default MapPlayer;
