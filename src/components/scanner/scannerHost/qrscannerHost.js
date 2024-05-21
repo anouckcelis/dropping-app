@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 // Importeer de Html5QrcodeScanner component uit de html5-qrcode bibliotheek voor QR-scanning
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
+import { useParams } from 'react-router-dom'; // Importeer de useParams hook
+
 // Importeer de CSS-bestand voor stijlen
 import '../../scanner/scannerHost/qrscannerHost.css';
 
