@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import L, { Icon } from 'leaflet';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, doc, setDoc, getDocs, where, query } from 'firebase/firestore';
 import '../../map/mapPlayer/mapPlayer.css';
-import { Icon } from 'leaflet';
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const MapPlayer = () => {
   const navigate = useNavigate();
-  
-  // Haal de gameId parameter uit de route-URL
   const { gameId } = useParams();
 
   // Definieer de states
@@ -20,7 +17,7 @@ const MapPlayer = () => {
   const [nearbyUsers, setNearbyUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [checkpoints, setCheckpoints] = useState([]);
-  const [scannedCheckpoints, setScannedCheckpoints] = useState([]); 
+  const [alreadyScanned, setAlreadyScanned] = useState(false); 
   const db = getFirestore();
 
   // Effect om de gebruikerslocatie op te halen en checkpoints te laden
@@ -31,7 +28,6 @@ const MapPlayer = () => {
         fetchUserLocation();
         setCurrentUserEmail(user.email);
         fetchCheckpoints();
-        fetchScannedCheckpoints(); 
       }
     });
 
@@ -54,89 +50,67 @@ const MapPlayer = () => {
     fetchCheckpoints();
   }, [gameId]);
 
-    // Functie om de gebruikerslocatie op te halen
-    const fetchUserLocation = () => {
-      navigator.geolocation.getCurrentPosition(position => {
-        setUserLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        });
-        updateUserLocation(getAuth().currentUser.uid, position.coords.latitude, position.coords.longitude, getAuth().currentUser.email);
-      }, error => {
-        console.error('Failed to fetch user location:', error);
+  // Functie om de gebruikerslocatie op te halen
+  const fetchUserLocation = () => {
+    navigator.geolocation.getCurrentPosition(position => {
+      setUserLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
       });
-    };
-  
-    // Functie om nabije gebruikers op te halen
-    const fetchNearbyUsers = async () => {
-      if (!userLocation) return;
-  
-      const db = getFirestore();
-      const userLocationsRef = collection(db, 'userLocations');
-      const maxDistance = 30;
-  
-      try {
-        const querySnapshot = await getDocs(userLocationsRef);
-        const nearbyUsersData = [];
-  
-        querySnapshot.forEach(doc => {
-          const userData = doc.data();
-          const distance = calculateDistance(userLocation.lat, userLocation.lng, userData.lat, userData.lng);
-  
-          if (distance <= maxDistance && userData.isLogged && userData.email!== currentUserEmail) {
-            nearbyUsersData.push(userData);
-          }
-        });
-  
-        setNearbyUsers(nearbyUsersData);
-      } catch (error) {
-        console.error("Error fetching nearby users:", error);
-      }
-    };
-  
-    // Functie om checkpoints op te halen op basis van gameId
-    const fetchCheckpoints = async () => {
-      if (!gameId) return;
-  
-      const db = getFirestore();
-      const checkpointsRef = collection(db, 'checkpoints');
-      let checkpointsData = [];
-  
-      try {
-        const q = query(checkpointsRef, where("gameId", "==", gameId));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(doc => {
-          const checkpointData = doc.data();
-          checkpointsData.push(checkpointData);
-        });
-  
-        setCheckpoints(checkpointsData);
-      } catch (error) {
-        console.error("Error fetching checkpoints:", error);
-      }
-    };
+      updateUserLocation(getAuth().currentUser.uid, position.coords.latitude, position.coords.longitude, getAuth().currentUser.email);
+    }, error => {
+      console.error('Failed to fetch user location:', error);
+    });
+  };
 
-      // Functie om gescande checkpoints op te halen
-  const fetchScannedCheckpoints = async () => {
-    if (!gameId) return;
+  // Functie om nabije gebruikers op te halen
+  const fetchNearbyUsers = async () => {
+    if (!userLocation) return;
 
     const db = getFirestore();
-    const scannedCheckpointsRef = collection(db, 'checkpoints');
+    const userLocationsRef = collection(db, 'userLocations');
+    const maxDistance = 30;
 
     try {
-      const querySnapshot = await getDocs(scannedCheckpointsRef);
-      const scannedCheckpointsData = [];
+      const querySnapshot = await getDocs(userLocationsRef);
+      const nearbyUsersData = [];
 
       querySnapshot.forEach(doc => {
-        const checkpointData = doc.data();
-        if (checkpointData.scanned) {
-          scannedCheckpointsData.push(checkpointData.name);
+        const userData = doc.data();
+        const distance = calculateDistance(userLocation.lat, userLocation.lng, userData.lat, userData.lng);
+
+        if (distance <= maxDistance && userData.isLogged && userData.email !== currentUserEmail) {
+          nearbyUsersData.push(userData);
         }
       });
 
-      setScannedCheckpoints(scannedCheckpointsData);
+      setNearbyUsers(nearbyUsersData);
     } catch (error) {
-      console.error("Error fetching scanned checkpoints:", error);
+      console.error("Error fetching nearby users:", error);
+    }
+  };
+
+  // Functie om checkpoints op te halen op basis van gameId
+  const fetchCheckpoints = async () => {
+    if (!gameId) return;
+
+    const db = getFirestore();
+    const checkpointsRef = collection(db, 'checkpoints');
+    let checkpointsData = [];
+
+    try {
+      const q = query(checkpointsRef, where("gameId", "==", gameId));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(doc => {
+        const checkpointData = doc.data();
+        // Voeg een veld toe om bij te houden of het checkpoint is gescand door de huidige gebruiker
+        checkpointData.scannedByCurrentUser = false;
+        checkpointsData.push(checkpointData);
+      });
+
+      setCheckpoints(checkpointsData);
+    } catch (error) {
+      console.error("Error fetching checkpoints:", error);
     }
   };
 
@@ -165,7 +139,7 @@ const MapPlayer = () => {
 
     setDoc(userDocRef, { isLogged: true }, { merge: true })
     .then(() => {
-        console.log("User  as logged in Firestore!");
+        console.log("User marked as logged in Firestore!");
       })
     .catch((error) => {
         console.error("Error marking user as logged in Firestore:", error);
@@ -191,7 +165,6 @@ const MapPlayer = () => {
       });
   };
 
-  
   const icon = L.icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -201,59 +174,65 @@ const MapPlayer = () => {
     shadowSize: [41, 41]
   });
 
-    // Definieer het pictogram voor niet-gescande checkpoints
-    const checkpointIcon = new Icon ({
-      iconUrl : 'https://img.icons8.com/doodle/48/flag.png',
-      iconSize : [35, 35],
-      iconAnchor : [17, 35],
-      popupAnchor : [0, -35]
-    });
-  
-    // Definieer het pictogram voor gescande checkpoints
-    const checkedIcon = new Icon({
-      iconUrl: "",
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    });
-  
-    // Functie om een checkpoint te scannen
-    const handleScanCheckpoint = async (checkpointName, email, user) => {
-      console.log(`Checkpoint ${checkpointName} wordt gescand!`);
-      navigate(`/qrscannerPlayer/${gameId}`);
-    
-      // Bereken de afstand tussen de ingelogde gebruiker en de speler die gevangen wordt
-      const distance = calculateDistance(userLocation.lat, userLocation.lng, user.lat, user.lng);
-      const maxDistance = 10; // Maximale afstand om te vangen is 10 meter
-    
-      if (distance <= maxDistance) {
-        try {
-          const db = getFirestore();
-          const usersRef = collection(db, 'players');
-    
-          const querySnapshot = await getDocs(query(usersRef, where("email", "==", email)));
-    
-          if (!querySnapshot.empty) {
-            const userDocSnapshot = querySnapshot.docs[0];
-            const userData = userDocSnapshot.data();
-            const aantalGescandeCheckpoints = userData.aantalGescandeCheckpoints || 0;
-    
-            console.log("Gebruikersgegevens gevonden:", userData);
-    
-            await setDoc(userDocSnapshot.ref, { aantalGescandeCheckpoints: aantalGescandeCheckpoints + 1 }, { merge: true });
-    
-            console.log(`Aantal gescande checkpoints voor ${email} is bijgewerkt.`);
-          } else {
-            console.error(`Gebruiker met e-mail ${email} bestaat niet.`);
-          }
-        } catch (error) {
-          console.error('Fout bij het bijwerken van het aantal gescande checkpoints:', error);
-        }
-      }
-    };
+  // Definieer het pictogram voor niet-gescande checkpoints
+  const checkpointIcon = new Icon ({
+    iconUrl : 'https://img.icons8.com/doodle/48/flag.png',
+    iconSize : [35, 35],
+    iconAnchor : [17, 35],
+    popupAnchor : [0, -35]
+  });
 
-      return (
+  // Functie om een checkpoint te scannen
+  const handleScanCheckpoint = async (checkpointName, email, user) => {
+    console.log(`Checkpoint ${checkpointName} wordt gescand!`);
+    navigate(`/qrscannerPlayer/${gameId}`);
+
+    // Bereken de afstand tussen de ingelogde gebruiker en de speler die gevangen wordt
+    const distance = calculateDistance(userLocation.lat, userLocation.lng, user.lat, user.lng);
+    const maxDistance = 10; // Maximale afstand om te vangen is 10 meter
+
+    if (distance <= maxDistance) {
+      try {
+        const db = getFirestore();
+        const usersRef = collection(db, 'players');
+        const userQuerySnapshot = await getDocs(query(usersRef, where("email", "==", email)));
+
+        if (!userQuerySnapshot.empty) {
+          const userDocSnapshot = userQuerySnapshot.docs[0];
+          const userData = userDocSnapshot.data();
+          const aantalGescandeCheckpoints = userData.aantalGescandeCheckpoints || 0;
+
+          console.log("Gebruikersgegevens gevonden:", userData);
+
+          // Controleer of het checkpoint al is gescand door de huidige gebruiker
+          const checkpointIndex = checkpoints.findIndex(checkpoint => checkpoint.name === checkpointName);
+          if (checkpointIndex !== -1 && checkpoints[checkpointIndex].scannedByCurrentUser) {
+            // Als het checkpoint al is gescand door de huidige gebruiker, stel de state in
+            setAlreadyScanned(true);
+            return;
+          }
+
+          // Voeg de gebruiker toe aan de scannedBy array van het checkpoint
+          await setDoc(userDocSnapshot.ref, { aantalGescandeCheckpoints: aantalGescandeCheckpoints + 1 }, { merge: true });
+          console.log(`Aantal gescande checkpoints voor ${email} is bijgewerkt.`);
+          
+          // Markeer het checkpoint als gescand door de huidige gebruiker
+          if (checkpointIndex !== -1) {
+            const updatedCheckpoints = [...checkpoints];
+            updatedCheckpoints[checkpointIndex].scannedByCurrentUser = true;
+            setCheckpoints(updatedCheckpoints);
+          }
+
+        } else {
+          console.error(`Gebruiker met e-mail ${email} bestaat niet.`);
+        }
+      } catch (error) {
+        console.error('Fout bij het bijwerken van het aantal gescande checkpoints:', error);
+      }
+    }
+  };
+
+  return (
     <div className="map-wrapper">
       <div className="map-container">
         <MapContainer key={userLocation? `${userLocation.lat}-${userLocation.lng}` : 'default'} center={userLocation? [userLocation.lat, userLocation.lng] : [51.2195, 4.4024]} zoom={12} style={{ height: "100%", width: "100%" }}>
@@ -280,7 +259,11 @@ const MapPlayer = () => {
             <Marker key={index} position={[checkpoint.lat, checkpoint.lng]} icon={checkpointIcon}>
               <Popup className='popUp-checkpoint'>
                 <p>{checkpoint.name}</p>
-                <button className='button-checkpoint-map' onClick={() => handleScanCheckpoint(checkpoint.name, currentUserEmail, checkpoint)}>Scan QR</button>
+                {checkpoint.scannedByCurrentUser ? (
+                  <p>Al gescand!</p>
+                ) : (
+                  <button className='button-checkpoint-map' onClick={() => handleScanCheckpoint(checkpoint.name, currentUserEmail, checkpoint)}>Scan QR</button>
+                )}
               </Popup>
             </Marker>
           ))}
@@ -292,3 +275,4 @@ const MapPlayer = () => {
 };
 
 export default MapPlayer;
+
