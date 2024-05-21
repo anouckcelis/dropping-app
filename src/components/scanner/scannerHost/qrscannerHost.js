@@ -11,11 +11,13 @@ import '../../scanner/scannerHost/qrscannerHost.css';
 import NavigatieHost from '../../navigatie/navigatieHost/navigatieHost';
 
 // Definieer de QRScannerHost component met een gameId prop
-const QRScannerHost = ({ gameId }) => {
+const QRScannerHost = () => {
     // Gebruik useState om de scanResult te beheren
     const [scanResult, setScanResult] = useState(null);
     // Gebruik useRef om een referentie naar de scanner te maken
     const scannerRef = useRef(null);
+
+    const { gameId } = useParams(); // Haal gameId op van de URL parameters
 
     // Gebruik useEffect om de scanner te initialiseren bij het mounten van de component
     useEffect(() => {

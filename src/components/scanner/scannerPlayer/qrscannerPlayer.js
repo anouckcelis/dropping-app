@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, updateDoc, getDocs, collection, query, where, doc } from 'firebase/firestore';
+import { getFirestore, getDocs, where, collection, query, updateDoc } from 'firebase/firestore';
+import { useParams } from 'react-router-dom'; // Importeer de useParams hook
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
 
-const QRScannerPlayer = ({ gameId }) => {
+const QRScannerPlayer = () => {
     const [scanResult, setScanResult] = useState(null);
     const scannerRef = useRef(null);
     const db = getFirestore();
     const auth = getAuth();
+    
+    const { gameId } = useParams(); // Haal gameId op van de URL parameters
 
     useEffect(() => {
         initializeScanner();
@@ -29,50 +32,73 @@ const QRScannerPlayer = ({ gameId }) => {
         }
     };
 
-    const handleScanSuccess = async (checkpointId) => {
-        setScanResult(checkpointId);
-        await saveScannedCheckpoint(checkpointId); // Wacht op het opslaan van het gescande checkpoint
+    const handleScanSuccess = async (scannedValue) => {
+        setScanResult(scannedValue);
+        await saveScannedCheckpoint(scannedValue, gameId);
     };
-    
-    const saveScannedCheckpoint = async (checkpointId) => {
+
+    const saveScannedCheckpoint = async (scannedValue, gameId) => {
         try {
+            console.log('scannedValue:', scannedValue);
+            console.log('gameId:', gameId);
+    
             const user = auth.currentUser;
             if (!user) {
                 console.error('Gebruiker is niet ingelogd.');
                 return;
             }
-            
+    
             const userEmail = user.email;
-            
+    
             // Controleer of gameId is gedefinieerd
             if (!gameId) {
                 console.error('gameId is niet gedefinieerd.');
                 return;
             }
     
-            const emailQuery = query(collection(db, 'players'), where('email', '==', userEmail));
-            const emailQuerySnapshot = await getDocs(emailQuery);
-            
-            const matchingPlayers = emailQuerySnapshot.docs.filter(doc => {
-                const playerData = doc.data();
-                return playerData.gameId === gameId;
-            });
-            
+            // Bouw de query op basis van de naam en gameId
+            let checkpointsQuery = collection(db, 'checkpoints');
+            if (gameId) {
+                checkpointsQuery = query(checkpointsQuery, where('gameId', '==', gameId));
+            }
+            checkpointsQuery = query(checkpointsQuery, where('name', '==', scannedValue));
     
-            if (matchingPlayers.length > 0) {
-                for (const doc of matchingPlayers) {
-                    const playerRef = doc.ref;
-                    const playerData = doc.data();
-                    const aantalGescandeCheckpoints = playerData.aantalGescandeCheckpoints || 0;
-                    await updateDoc(playerRef, { aantalGescandeCheckpoints: aantalGescandeCheckpoints + 1 });
-                }
-            } else {
-                console.error('Geen overeenkomende speler gevonden voor ingelogde gebruiker en gameId:', userEmail, gameId);
+            // Voer de query uit
+            const checkpointsQuerySnapshot = await getDocs(checkpointsQuery);
+    
+            if (checkpointsQuerySnapshot.empty) {
+                console.error('Checkpoint niet gevonden voor de opgegeven naam en gameId.');
+                return;
             }
     
-            // Markeer het gescande checkpoint als gescand
-            const checkpointDocRef = doc(db, 'checkpoints', checkpointId);
-            await updateDoc(checkpointDocRef, { scanned: true });
+            // Loop door elk gevonden checkpoint en update het veld scannedBy
+            checkpointsQuerySnapshot.forEach(async (doc) => {
+                try {
+                    // Hier kun je elk gevonden checkpoint verwerken
+                    const checkpointData = doc.data();
+                    console.log('Checkpoint gevonden:', checkpointData);
+    
+                    // Update het veld scannedBy met het e-mailadres van de ingelogde gebruiker
+                    const checkpointRef = doc.ref;
+                    let updatedScannedBy = [];
+    
+                    // Controleer of scannedBy al bestaat en kopieer het naar updatedScannedBy
+                    if (checkpointData.scannedBy) {
+                        updatedScannedBy = [...checkpointData.scannedBy];
+                    }
+    
+                    // Voeg het e-mailadres van de ingelogde gebruiker toe aan updatedScannedBy
+                    updatedScannedBy.push(userEmail);
+    
+                    await updateDoc(checkpointRef, {
+                        scannedBy: updatedScannedBy
+                    });
+                    console.log('scannedBy veld is bijgewerkt met:', userEmail);
+                } catch (error) {
+                    console.error('Fout bij het bijwerken van het scannedBy veld:', error);
+                }
+            });
+    
         } catch (error) {
             console.error('Fout bij het bijwerken van gescande checkpoints:', error);
         }
