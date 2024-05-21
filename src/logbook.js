@@ -10,12 +10,15 @@ import { FaArrowLeft } from 'react-icons/fa';
 // Importeer de CSS-bestand voor stijlen
 import './logbook.css';
 
+import { useParams } from 'react-router-dom';
+
 // Definieer de Logbook component met een gameId prop
-const Logbook = ({ gameId }) => {
+const Logbook = () => {
   // Gebruik useState om de waarden van players, loading, en error te beheren
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { gameId } = useParams();
 
   // Gebruik useEffect om een effect te definiëren dat wordt uitgevoerd bij het mounten van de component en bij wijziging van gameId
   useEffect(() => {
@@ -29,7 +32,7 @@ const Logbook = ({ gameId }) => {
 
         // Haal de spelers op
         const playerSnapshot = await getDocs(playersQuery);
-        const playersData = playerSnapshot.docs.map(doc => doc.data());
+        const playersData = playerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         // Filter de spelers op basis van de rol (player) voordat we ze in de state zetten
         const filteredPlayers = playersData.filter(player => player.role === 'player');
@@ -63,16 +66,18 @@ const Logbook = ({ gameId }) => {
       
       <h3>Informatie over het spel en de deelnemers</h3>
     
-      {loading? (
+      {loading ? (
         <p>Laden...</p>
-      ) : players.length > 0? (
+      ) : error ? (
+        <p>{error}</p>
+      ) : players.length > 0 ? (
         <ul className="item-wrapper">
           {players.map((player, index) => (
             <li key={index} className="item">
               <span className="item__position">{player.email}</span>
-              <span>Totaal aantal punten gescand: {player.aantalGescandeCheckpoints }</span>
-              <span>Aantal keer gecatcht: {player.aantalKeerGecatcht} </span>
-              <span>Tijd: </span>
+              <li>Totaal aantal punten gescand: <strong className='color'>{player.aantalGescandeCheckpoints || 0}</strong></li>
+              <li>Aantal keer gecatcht: <strong className='color'>{player.aantalKeerGecatcht || 0}</strong></li>
+              <li>Tijd: <strong className='color'>{player.timestamp ? new Date(player.timestamp.seconds * 1000).toLocaleString() : 'Geen tijd beschikbaar'}</strong></li>
             </li>
           ))}
         </ul>
@@ -89,3 +94,4 @@ const Logbook = ({ gameId }) => {
 
 // Exporteer de component zodat deze kan worden gebruikt in andere bestanden
 export default Logbook;
+

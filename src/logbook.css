@@ -57,16 +57,17 @@
       border: 2px solid #257eca;
       width: 300px;
       padding: 0;
+      list-style-type: none; /* Verwijder de opsommingstekens */
     }
     
     .item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: block; /* Verander van flex naar block */
       padding: 10px;
       will-change: transform;
       transition: all 0.3s ease-in;
+
     }
+    
   
     .item__name {
       margin-left: 10px;
@@ -74,6 +75,10 @@
 
     .item__position {
       font-weight: bold;
+    }
+
+    .color {
+      color:#257eca;
     }
   
 
