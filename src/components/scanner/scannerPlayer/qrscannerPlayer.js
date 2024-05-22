@@ -2,21 +2,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, getDocs, where, collection, query, updateDoc } from 'firebase/firestore';
-import { useParams } from 'react-router-dom'; // Importeer de useParams hook
+import { useParams } from 'react-router-dom'; // Importeer de useParams hook om URL parameters op te halen
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
 
+// Definitie van de QRScannerPlayer component
 const QRScannerPlayer = () => {
+    // State om scanresultaat op te slaan
     const [scanResult, setScanResult] = useState(null);
+    // Ref om de scanner instantie op te slaan
     const scannerRef = useRef(null);
+    // Firestore database instantie
     const db = getFirestore();
+    // Firebase authenticatie instantie
     const auth = getAuth();
     
-    const { gameId } = useParams(); // Haal gameId op van de URL parameters
+    // Haal gameId op van de URL parameters
+    const { gameId } = useParams(); 
 
+    // useEffect hook om de scanner te initialiseren bij het laden van de component
     useEffect(() => {
         initializeScanner();
     }, []);
 
+    // Functie om de QR-code scanner te initialiseren
     const initializeScanner = () => {
         if (!scannerRef.current) {
             const scanner = new Html5QrcodeScanner('reader', {
@@ -27,16 +35,19 @@ const QRScannerPlayer = () => {
                 fps: 5,
             });
 
+            // Render de scanner en stel de succes callback in
             scanner.render(handleScanSuccess);
             scannerRef.current = scanner;
         }
     };
 
+    // Callback functie voor een succesvolle scan
     const handleScanSuccess = async (scannedValue) => {
         setScanResult(scannedValue);
         await saveScannedCheckpoint(scannedValue, gameId);
     };
 
+    // Functie om gescande checkpoint gegevens op te slaan
     const saveScannedCheckpoint = async (scannedValue, gameId) => {
         try {
             console.log('scannedValue:', scannedValue);
@@ -74,20 +85,16 @@ const QRScannerPlayer = () => {
             // Loop door elk gevonden checkpoint en update het veld scannedBy
             checkpointsQuerySnapshot.forEach(async (doc) => {
                 try {
-                    // Hier kun je elk gevonden checkpoint verwerken
                     const checkpointData = doc.data();
                     console.log('Checkpoint gevonden:', checkpointData);
     
-                    // Update het veld scannedBy met het e-mailadres van de ingelogde gebruiker
                     const checkpointRef = doc.ref;
                     let updatedScannedBy = [];
     
-                    // Controleer of scannedBy al bestaat en kopieer het naar updatedScannedBy
                     if (checkpointData.scannedBy) {
                         updatedScannedBy = [...checkpointData.scannedBy];
                     }
     
-                    // Voeg het e-mailadres van de ingelogde gebruiker toe aan updatedScannedBy
                     updatedScannedBy.push(userEmail);
     
                     await updateDoc(checkpointRef, {
@@ -104,7 +111,7 @@ const QRScannerPlayer = () => {
         }
     };
     
-
+    // Functie om opnieuw te scannen
     const handleScanAgain = () => {
         setScanResult(null);
     };
