@@ -122,8 +122,22 @@ const QRScannerPlayer = () => {
             <div className="scanner-container" id="reader"></div>
             {scanResult ? (
                 <div className="scan-result">
-                    <p>Resultaat: <br /> <a href={"http://" + scanResult}>{scanResult}</a></p>
-                    <button className="button-opnieuw" onClick={handleScanAgain}>Opnieuw scannen</button>
+                    {scanResult === "Einde" ? (
+                        <div>
+                             <div style={{ border: '2px solid red', background:'red', padding: '10px', fontSize: '25px', color: 'white' }}>
+                            Het spel is beëindigd!
+                            <br></br>
+                            Ga naar de accountpagina om de ranking en het logboek te bekijken.
+                            </div>
+                            
+                        </div>
+                        
+                    ) : (
+                        <React.Fragment>
+                            <p>Resultaat: <br /> <a href={"http://" + scanResult}>{scanResult}</a></p>
+                            <button className="button-opnieuw" onClick={handleScanAgain}>Opnieuw scannen</button>
+                        </React.Fragment>
+                    )}
                 </div>
             ) : null}
             <NavigatiePlayer gameId={gameId} />

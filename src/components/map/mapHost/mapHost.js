@@ -187,7 +187,7 @@ const MapHost = () => {
     }
   
     // Log de e-mail van de speler om te controleren of de ingelogde gebruiker de verwachte is
-    console.log("E-mail van de speler:", email); 
+    console.log("E-mail van de speler:", email);
   
     // Bereken de afstand tussen de ingelogde gebruiker en de speler die gevangen wordt
     const distance = calculateDistance(userLocation.lat, userLocation.lng, user.lat, user.lng);
@@ -209,9 +209,12 @@ const MapHost = () => {
           const aantalKeerGecatcht = userData.aantalKeerGecatcht || 0;
   
           console.log("Gebruikersgegevens gevonden:", userData);
-
+  
           await setDoc(userDocSnapshot.ref, { aantalKeerGecatcht: aantalKeerGecatcht + 1 }, { merge: true });
-          
+  
+          // Verwijder de e-mail van de speler uit de gescande checkpoints
+          await removePlayerScannedCheckpoints(email);
+  
           console.log(`Aantal keer gecatcht voor ${email} is bijgewerkt.`);
         } else {
           console.error(`Speler met e-mail ${email} bestaat niet.`);
@@ -222,9 +225,32 @@ const MapHost = () => {
     } else {
       console.error('Speler is buiten bereik om te vangen of de gameId komt niet overeen.');
     }
-};
+  };
   
+  // Helperfunctie om de gescande checkpoints van een speler te verwijderen
+  const removePlayerScannedCheckpoints = async (email) => {
+    const db = getFirestore();
+    const checkpointsRef = collection(db, 'checkpoints');
+    const q = query(checkpointsRef, where("gameId", "==", gameId)); // Alleen filteren op gameId
   
+    try {
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (doc) => {
+        const checkpointData = doc.data();
+        
+        // Controleer of de speler de checkpoint heeft gescand
+        if (checkpointData.scannedBy && checkpointData.scannedBy.includes(email)) {
+          // Verwijder de e-mail van de speler uit de scannedBy-array
+          const updatedScannedBy = checkpointData.scannedBy.filter(userEmail => userEmail !== email);
+          
+          await setDoc(doc.ref, { scannedBy: updatedScannedBy }, { merge: true });
+          console.log(`Checkpoint ${doc.id} bijgewerkt, ${email} verwijderd uit scannedBy.`);
+        }
+      });
+    } catch (error) {
+      console.error("Error removing player from scanned checkpoints:", error);
+    }
+  };
   
   // Definieer de iconen voor de markers op de kaart
   const icon = L.icon({
