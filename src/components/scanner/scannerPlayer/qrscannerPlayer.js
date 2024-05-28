@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, getDocs, where, collection, query, updateDoc } from 'firebase/firestore';
-import { useParams } from 'react-router-dom'; // Importeer de useParams hook om URL parameters op te halen
+import { useParams, useNavigate } from 'react-router-dom'; // Importeer de useParams hook om URL parameters op te halen
 import NavigatiePlayer from '../../navigatie/navigatiePlayer/navigatiePlayer';
 
 // Definitie van de QRScannerPlayer component
@@ -18,6 +18,8 @@ const QRScannerPlayer = () => {
     
     // Haal gameId op van de URL parameters
     const { gameId } = useParams(); 
+
+    const navigate = useNavigate();
 
     // useEffect hook om de scanner te initialiseren bij het laden van de component
     useEffect(() => {
@@ -116,6 +118,11 @@ const QRScannerPlayer = () => {
         setScanResult(null);
     };
 
+    const navigateToAccountPage = () => {
+        navigate(`../accountPlayer/${gameId}`);
+    };
+
+
     return (
         <div className="qr-scanner">
             <h1>QR Scanner</h1>
@@ -124,14 +131,16 @@ const QRScannerPlayer = () => {
                 <div className="scan-result">
                     {scanResult === "Einde" ? (
                         <div>
-                             <div style={{ border: '2px solid red', background:'red', padding: '10px', fontSize: '25px', color: 'white' }}>
-                            Het spel is beëindigd!
-                            <br></br>
-                            Ga naar de accountpagina om de ranking en het logboek te bekijken.
-                            </div>
-                            
+                            <button
+                                style={{ border: '2px solid red', background: 'red', padding: '10px', fontSize: '25px', color: 'white' }}
+                                onClick={navigateToAccountPage} // Voeg de onClick handler toe
+                            >
+                                Het spel is beëindigd!
+                                <br></br>
+                                Klik hier om het logboek en het leaderboeard te bekijken!
+                            </button>
                         </div>
-                        
+                                                   
                     ) : (
                         <React.Fragment>
                             <p>Resultaat: <br /> <a href={"http://" + scanResult}>{scanResult}</a></p>
